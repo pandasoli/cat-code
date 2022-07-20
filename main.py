@@ -46,7 +46,7 @@ def main():
 
         for item in arrRemDup(re.findall(regex, files[file]['code'])):
           files[file]['code'] = re.sub(
-            '\{item}',
+            item,
             f'\033[{color}m{item}\033[0m',
             files[file]['code']
           )
