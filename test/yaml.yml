@@ -1,0 +1,8 @@
+string: value
+boolean: false
+number: 2.0221
+object:
+  key: value
+array:
+  - item1
+  - item2
