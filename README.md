@@ -2,7 +2,10 @@
 
 ![Cat Code Logo](doc/thumb.png)
 
-Command to the linux bash
+Select a idiom:  
+[Português Brasil](README_pt-br.md)  
+[United States English](README_en-us.md)  
+[Español dominicano](README_sp-do.md)
 
 
 </div>
