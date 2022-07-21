@@ -4,6 +4,7 @@
   "number": 2.0221,
   "object": {
     "string": "value",
+    "boolean": true,
     "key": "value"
   },
   "array": [

@@ -2,6 +2,8 @@ string: value
 boolean: false
 number: 2.0221
 object:
+  string: string
+  number: 2005
   key: value
 array:
   - item1
