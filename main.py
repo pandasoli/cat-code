@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-from sqlite3 import connect
+from pickle import FALSE
 import sys
 import yaml
 import re
+import opacity_str
 
 def arrRemDup(arr):
   res = []
@@ -11,6 +12,15 @@ def arrRemDup(arr):
   for item in arr:
     if item not in res:
       res.append(item)
+
+  return res
+
+def whereare(str, text):
+  res = []
+
+  for x in range(0, len(str)):
+    if str[x:x + len(text)] == text:
+      res.append(x)
 
   return res
 
@@ -32,27 +42,53 @@ def main():
 
   for file in files:
     lookat = files[file]['lookat']
-    config = {}
+    code = opacity_str('')
+    config = {
+      'colors': [],
+      'regexes': []
+    }
 
     with open(f'langs/{lookat}.yml', 'r') as content:
-      config = yaml.safe_load(content)
+      gps = yaml.safe_load(content)
+
+      for key in config.keys():
+        if key in gps.keys():
+          config[key] = gps[key]
 
     with open(file, 'r') as content:
-      files[file]['code'] = ''.join(content.readlines())
+      code.setStr(''.join(content.readlines()))
 
-      for gx in config['regexes']:
-        regex = gx['regex']
-        color = str(config['colors'][gx['color']])
+    for gp in config['regexes']:
+      regexes = gp['regex']
+      color = gp['color']
+      important = False
 
-        for item in arrRemDup(re.findall(regex, files[file]['code'])):
-          files[file]['code'] = re.sub(
-            item,
-            f'\033[{color}m{item}\033[0m',
-            files[file]['code']
-          )
+      if type(regexes) != list:
+        regexes = [regexes]
 
-  for file in files:
-    print(files[file]['code'])
+      if 'important' in gp.keys():
+        important = bool(gp['important'])
+
+      if color in config['colors']:
+        color = config['colors'][color]
+      else:
+        if len(re.findall(r'[0-9\;]+', str(color))) == 0:
+          color = 37
+
+      for regex in regexes:
+        values = arrRemDup(re.findall(regex, code.str))
+
+        for val in values:
+          pos = whereare(code.str, val)
+
+          for x in pos:
+            code.add(f'\033[{color}m', x)
+            code.add(f'\033[0m', x + len(val))
+
+            if important:
+              code.remove(x, x + len(val))
+
+    print(code.res)
 
 if __name__ == '__main__':
   main()

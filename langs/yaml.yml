@@ -1,1 +1,20 @@
-my-girl: Emily
+regexes:
+  - color: 32
+    regex: '[a-zA-Z0-9_-]+'
+
+  - color: 34
+    regex: '[a-zA-Z0-9_-]+:'
+
+  - color: 31
+    regex:
+      - '\bfalse'
+      - '\btrue'
+
+  - color: 33
+    important: true
+    regex: '\b[0-9]+(?:\.[0-9]+)?'
+
+  - color: 37
+    regex:
+      - ':'
+      - '-'

@@ -7,6 +7,7 @@
     "boolean": true,
     "key": "value"
   },
+  // array:
   "array": [
     "item1",
     "item2"

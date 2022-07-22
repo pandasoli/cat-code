@@ -1,29 +1,35 @@
 colors:
-  key: '1;35'
-  number: '0;33'
-  brackets: '0;30'
+  key: 35
+  number: 33
+  boolean: 31
+  value: 32
+  brackets: 36
+  comment: 30
 
 regexes:
   - color: 'number'
     regex: '[0-9]+?\.[0-9]+'
 
+  - color: 'boolean'
+    regex:
+      - '\bfalse\b'
+      - '\btrue\b'
+
+  - color: 'value'
+    regex: '\"[a-zA-Z0-9_-]+\"'
+
   - color: 'key'
     regex: '[a-zA-Z0-9\"_-]+?(?=:)'
 
   - color: 'brackets'
-    regex: '{'
+    regex:
+      - '\['
+      - ']'
+      - '{'
+      - '}'
+      - ':'
+      - ','
 
-  - color: 'brackets'
-    regex: '}'
-
-  - color: 'brackets'
-    regex: '\['
-
-  - color: 'brackets'
-    regex: ']'
-
-  - color: 'brackets'
-    regex: ':'
-
-  - color: 'brackets'
-    regex: ','
+  - color: 'comment'
+    important: true
+    regex: '//.*'
