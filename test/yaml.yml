@@ -1,10 +1,14 @@
 string: value
 boolean: false
 number: 2.0221
-object:
-  string: string
-  number: 2005
-  key: value
+# object:
+  # string: string
+  # number: 2005
+  # key: value
+  # simple comment
+# array:
 array:
   - item1
   - item2
+
+# comment
