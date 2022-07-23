@@ -4,29 +4,14 @@
 [Comienzo](README.md)
 
 ## ◈ Como instalar
-Ejecutes el seguinte comando en tu terminal linux:
+Ejecutes los seguintes comandos en tu terminal linux:
 
 <div align='left'>
 
   ```shell
-    $ mkdir ~/my-path; cd ~/my-path             # creando un path para tus comandos
-    $ git clone https://github.com/pandasoli/cat-code.git # descargando el proyecto
-    $ mv cat-code/src/* .; rm -r -f cat-code # poniendo todo en la carpeta del path
-    $ mv main.py catc                          # renombrando el archivo principal
-    $ chmod +x ./catc                          # torneando ejecutable
-  ```
-</div>
-
-Después de eso tú necesitas adicionar la carpeta que criaste en el path del sistema.  
-Entonces al final del archivo ~/.profile escribas:
-<div align='left'>
-
-  ```sh
-    # MINE
-
-    if [ -b "$HOME/my-path" ] ; then
-      PATH="$HOME/my-path:$PATH"
-    fi
+    $ cd cat-code
+    $ chmod +x ./mach.sh
+    $ ./make.sh
   ```
 </div>
 <br/>
