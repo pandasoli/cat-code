@@ -33,7 +33,7 @@ def main():
     "      \033[31mregex\033[37m: \033[32m'[a-zA-Z]'",
     '',
     'If your language has more than one extenssion,',
-    ' in the file extensions.yml put this:',
+    'in the file extensions.yml put this:',
     '  \033[30m# "<extenssion>": "name of the yaml created at /langs"',
     "  \033[30m# OBS: it's not necessary the file name.",
     '  \033[31mc\033[37m: \033[32mcpp',
