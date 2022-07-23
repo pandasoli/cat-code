@@ -1,0 +1,5 @@
+# python cache
+__pycache__
+
+# cache
+*.cache.txt
