@@ -3,18 +3,46 @@
 ![Cat Code Logo](doc/thumb.png)  
 [Comienzo](README.md)
 
-## Como utilizar
-En tu terminal linux simplemente ejecutes el comando:
+## ◈ Como instalar
+Ejecutes el seguinte comando en tu terminal linux:
 
 <div align='left'>
 
   ```shell
-    catc file.yml
+    $ mkdir ~/my-path; cd ~/my-path             # creando un path para tus comandos
+    $ git clone https://github.com/pandasoli/cat-code.git # descargando el proyecto
+    $ mv cat-code/src/* .; rm -r -f cat-code # poniendo todo en la carpeta del path
+    $ mv main.py catc                          # renombrando el archivo principal
+    $ chmod +x ./catc                          # torneando ejecutable
+  ```
+</div>
+
+Después de eso tú necesitas adicionar la carpeta que criaste en el path del sistema.  
+Entonces al final del archivo ~/.profile escribas:
+<div align='left'>
+
+  ```sh
+    # MINE
+
+    if [ -b "$HOME/my-path" ] ; then
+      PATH="$HOME/my-path:$PATH"
+    fi
   ```
 </div>
 <br/>
 
-## Como crear tu propia highlight
+## ◈ Como utilizar
+Ahora solo ejecutes el comando:
+
+<div align='left'>
+
+  ```sh
+    catc file.yml # ...archivos
+  ```
+</div>
+<br/>
+
+## ◈ Como crear tu propia highlight
 En la carpeta /langs es donde están los archivos de configuración  
 de cada linguaje, todos tienen la extensión .yml.
 
