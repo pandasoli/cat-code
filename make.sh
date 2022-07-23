@@ -5,7 +5,7 @@ fi
 
 if [ -d "~/my-path/cat-code" ]; then
   rm -r -f ~/my-path/cat-code/*
-else
+elif [ -f "~/my-path/cat-code" ]; then
   mkdir ~/my-path/cat-code
 fi
 
