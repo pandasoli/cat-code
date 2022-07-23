@@ -30,16 +30,16 @@ def openf(local, do = lambda content: print(content)):
 def main():
   program_dir = os.path.dirname(os.path.realpath(__file__))
 
-  if sys.argv[1] == 'help':
-    help()
-    exit()
-
   for file in sys.argv[1:]:
     splited = file.split('.')
     extension = splited[len(splited) - 1]
     config = {}
 
     print('')
+
+    if file == '--help' or file == '-h':
+      help()
+      continue
 
     def loadConfig(content):
       list = yaml.safe_load(content)
@@ -53,9 +53,12 @@ def main():
           config = {}
 
         def error(message):
-          print(f'\033[1;31m{file}\033[0m')
-          print(f'  \033[31m{at}.yml\033[0m: Got an unexpected architecture')
+          print(f'\033[1;31m◈ {file}')
+          print(f'  \033[0;31m{at}.yml\033[37m: Got an unexpected architecture')
           print(f'  {message}')
+          print('')
+          print('  \033[1;37m◈ To more help')
+          print('    \033[0;31mcatc \033[33m--help\033[0m')
           print('')
           return False
 
@@ -67,7 +70,7 @@ def main():
         if not 'groups' in config.keys():
           return error("There's no groups object")
         # elif type(config['groups']) is not list:
-        #   error()
+          # return error("Groups isn't a list")
 
         for group in config['groups']:
           if not 'color' in group.keys():
@@ -122,7 +125,7 @@ def main():
               code.add(f'\033[{color}m', pos)
               code.add(f'\033[0m', pos + len(match))
 
-      print(f'\033[1;32m{file}\033[0m:')
+      print(f'\033[1;32m◈ {file}\033[0m:')
       print('  ' + '\n  '.join(code.join().split('\n')))
 
 if __name__ == '__main__':
