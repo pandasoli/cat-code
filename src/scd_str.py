@@ -115,11 +115,6 @@ class main:
       res = res[:color['pos'] + sumOfColors] + color['value'] + res[color['pos'] + sumOfColors:]
       sumOfColors += len(color['value'])
 
-
-    f = open(f'{self.program_dir}/[scd_str] join.cache.txt', 'w')
-    f.write(res)
-    f.close()
-
     return res
 
 
