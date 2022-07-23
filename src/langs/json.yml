@@ -1,0 +1,23 @@
+groups:
+  - color: 32
+    regex: '"[a-zA-Z0-9]+"'
+
+  - color: 33
+    regex: '\b[0-9]+(?:\.[0-9]+)?'
+
+  - color: 35
+    regex: '[a-zA-Z0-9\"_-]+?(?=:)'
+
+  - color: 31
+    regexes:
+      - '\bfalse'
+      - '\btrue'
+
+  - color: 34
+    regexes:
+      - ':|,'
+      - '\[|]'
+      - '{|}'
+
+  - color: 30
+    regex: '\/\/.*'

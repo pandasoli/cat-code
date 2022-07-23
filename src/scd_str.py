@@ -1,11 +1,13 @@
 import sys
 import re
+import os
 
 
 class main:
   str = ''
   scdline = ''
   scdline_colors = []
+  program_dir = os.path.dirname(os.path.realpath(__file__))
 
   def whereis(self, text, value) -> list:
     res = []
@@ -58,7 +60,7 @@ class main:
         if len(self.scdline_colors) == 0:
           self.scdline_colors.append({
             'value': color,
-            'pos': pos + len(self.scdline[:pos])
+            'pos': pos
           })
         else:
           for x in range(0, len(self.scdline_colors)):
@@ -89,15 +91,13 @@ class main:
     self.scdline = self.scdline[:start] + cleanVal + self.scdline[end:]
 
   def removeColors(self, start, end) -> None:
-    new = []
+    n = []
 
-    for x in range(0, len(self.scdline_colors)):
-      color = self.scdline_colors[x]
-
+    for color in self.scdline_colors:
       if color['pos'] <= start or color['pos'] > end:
-        new.append(color)
+        n.append(color)
 
-    self.scdline_colors = new
+    self.scdline_colors = n
 
   def join(self) -> str:
     res = ''
@@ -114,6 +114,11 @@ class main:
     for color in self.scdline_colors:
       res = res[:color['pos'] + sumOfColors] + color['value'] + res[color['pos'] + sumOfColors:]
       sumOfColors += len(color['value'])
+
+
+    f = open(f'{self.program_dir}/[scd_str] join.cache.txt', 'w')
+    f.write(res)
+    f.close()
 
     return res
 

@@ -1,0 +1,15 @@
+[34m{[0m
+  [32m[35m"string"[0m[34m:[0m [32m"value"[0m[34m,[0m
+  [32m[35m"boolean"[0m[34m:[0m [31mfalse[0m[34m,[0m
+  [32m[35m"number"[0m[34m:[0m [33m2.0221[0m[34m,[0m
+  [32m[35m"object"[0m[34m:[0m [34m{[0m
+    [32m[35m"string"[0m[34m:[0m [32m"value"[0m[34m,[0m
+    [32m[35m"boolean"[0m[34m:[0m [31mtrue[0m[34m,[0m
+    [32m[35m"key"[0m[34m:[0m [32m"value"[0m
+  [34m}[0m,[0m
+  [30m// array:[0m
+  [32m[35m"array"[0m[34m:[0m [34m[[0m
+    [32m"item1"[0m[34m,[0m
+    [32m"item2"[0m
+  [34m][0m
+[34m}[0m
