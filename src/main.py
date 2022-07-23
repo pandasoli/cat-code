@@ -1,10 +1,11 @@
-import sys
 import re
-from types import NoneType
-import yaml
 import os
+import sys
+import yaml
+from types import NoneType
 from os import path
 
+import help
 import scd_str
 
 '''
@@ -29,6 +30,10 @@ def openf(local, do = lambda content: print(content)):
 def main():
   program_dir = os.path.dirname(os.path.realpath(__file__))
 
+  if sys.argv[1] == 'help':
+    help()
+    exit()
+
   for file in sys.argv[1:]:
     splited = file.split('.')
     extension = splited[len(splited) - 1]
@@ -47,25 +52,28 @@ def main():
         if type(config) is NoneType:
           config = {}
 
-        def error():
+        def error(message):
           print(f'\033[1;31m{file}\033[0m')
           print(f'  \033[31m{at}.yml\033[0m: Got an unexpected architecture')
+          print(f'  {message}')
           print('')
-          exit()
+          return False
 
         if not 'colors' in config.keys():
           config['colors'] = {}
         elif type(config['colors']) is not dict:
-          error()
+          return error("Colors isn't an object")
 
         if not 'groups' in config.keys():
-          error()
+          return error("There's no groups object")
         # elif type(config['groups']) is not list:
         #   error()
 
         for group in config['groups']:
-          if (not 'color' in group.keys()) or (not 'regex' in group.keys() and not 'regexes' in group.keys()):
-            error()
+          if not 'color' in group.keys():
+            return error("There's a group with no color")
+          if not 'regex' in group.keys() and not 'regexes' in group.keys():
+            return error("There's a group without regex and regexes")
 
         for x in range(0, len(config['groups'])):
           group = config['groups'][x]
@@ -85,6 +93,9 @@ def main():
       return config
 
     config = openf(f'{program_dir}/extensions.yml', loadConfig)
+
+    if config == False:
+      continue
 
     with open(file, 'r') as content:
       code = scd_str(''.join(content.readlines()) + '\n')
