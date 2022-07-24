@@ -50,13 +50,20 @@ class main:
     configStatus = self.loadConfig() 
 
 
-    content = openf(file).content
-    code = scd_str(content)
+    fileOpen = openf(file)
+
+    if fileOpen.status == False:
+      print('')
+      print(f"\033[1;31m◈ {file}\033[0;31m: Doesn't found")
+      print('')
+      return
+
+    code = scd_str(fileOpen.content)
     config = self.current['config']
 
     if configStatus != 0:
       if configStatus == 2:
-        self.show(content, False)
+        self.show(fileOpen.content, False)
       return
 
     for group in config['groups']:
