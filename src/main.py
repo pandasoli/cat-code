@@ -36,10 +36,6 @@ class main:
   }
 
   def __call__(self, file) -> None:
-    if file == '--help' or file == '-h':
-      help()
-      return
-
     self.current['file'] = file
     self.current['extension'] = file.split('.')[-1]
 
@@ -165,7 +161,14 @@ class main:
 
 
 if __name__ == '__main__':
+  if len(sys.argv) == 1:
+    help()
+    return
+
   fun = main()
 
   for file in sys.argv[1:]:
-    fun(file)
+    if file == '--help' or file == '-h':
+      help()
+    else:
+      fun(file)
