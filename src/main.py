@@ -1,14 +1,13 @@
-#!/usr/bin/python3
-
-import re
-import os
 import sys
+import re
 import yaml
 from types import NoneType
 from os import path
 
 import help
 import scd_str
+import openf
+
 
 '''
   Created by Panda Soli
@@ -21,129 +20,143 @@ import scd_str
     Github: pandasoli
 '''
 
-def openf(local, do = lambda content: print(content)):
-  if not path.exists(local):
-    return None
-  else:
-    with open(local, 'r') as content:
-      return do(content)
 
-def main():
-  program_dir = os.path.dirname(os.path.realpath(__file__))
-  program_relative_dir = program_dir
+class main:
+  user_path = path.expanduser('~')
+  program_dir = path.dirname(path.realpath(__file__))
+  program_relative_dir = re.sub(fr'^{user_path}', '~', program_dir)
 
-  if program_dir[:len(os.path.expanduser('~'))] == os.path.expanduser('~'):
-    program_relative_dir = '~' + program_relative_dir[len(os.path.expanduser('~')):]
+  current = {
+    'file': '',
+    'extension': '',
+    'config-file': '',
+    'config': {}
+  }
 
-  for file in sys.argv[1:]:
-    splited = file.split('.')
-    extension = splited[len(splited) - 1]
-    config = {}
-
-    print('')
-
+  def __call__(self, file) -> None:
     if file == '--help' or file == '-h':
       help()
-      continue
+      return
 
-    def loadConfig(content):
-      list = yaml.safe_load(content)
-      config = {}
-      at = extension
+    self.current['file'] = file
+    self.current['extension'] = file.split('.')[-1]
 
-      def setConfig(content):
-        config = yaml.safe_load(content)
+    extension = self.current['extension']
+    extensions = yaml.safe_load( openf(f'{self.program_dir}/extensions.yml').content )
 
-        if type(config) is NoneType:
-          config = {}
+    self.current['config-file'] = extensions[extension] if extension in extensions else extension
+    configStatus = self.loadConfig() 
 
-        def error(message):
-          print(f'\033[1;31m◈ {file}')
-          print(f'  \033[0;31m{at}.yml\033[37m: Got an unexpected architecture')
-          print(f'  {message}')
-          print('')
-          print('  \033[1;37m◈ To more help')
-          print('    \033[0;31mcatc \033[33m--help\033[0m')
-          print('')
-          return False
 
-        if not 'colors' in config.keys():
-          config['colors'] = {}
-        elif type(config['colors']) is not dict:
-          return error("Colors isn't an object")
+    content = openf(file).content
+    code = scd_str(content)
+    config = self.current['config']
 
-        if not 'groups' in config.keys():
-          return error("There's no groups object")
-        # elif type(config['groups']) is not list:
-          # return error("Groups isn't a list")
+    if configStatus != 0:
+      if configStatus == 2:
+        self.show(content, False)
+      return
 
-        for group in config['groups']:
-          if not 'color' in group.keys():
-            return error("There's a group with no color")
-          if not 'regex' in group.keys() and not 'regexes' in group.keys():
-            return error("There's a group without regex and regexes")
+    for group in config['groups']:
+      color = group['color']
+      regexes = []
 
-        for x in range(0, len(config['groups'])):
-          group = config['groups'][x]
+      if 'regex' in group.keys():
+        regexes.append(group['regex'])
 
-          if len( re.findall(r'^[0-9;]+$', str(group['color'])) ) == 0:
-            if group['color'] in config['colors'].keys():
-              config['groups'][x]['color'] = config['colors'][group['color']]
-            else:
-              config['groups'][x]['color'] = 37
+      if 'regexes' in group.keys():
+        regexes += group['regexes']
 
-        return config
+      for regex in regexes:
+        matches = code.rmdup(re.findall(regex, code.str))
 
-      if extension in list:
-        at = list[extension]
+        for match in matches:
+          poses = code.whereis(code.str, match)
 
-      config = openf(f'{program_dir}/langs/{at}.yml', setConfig)
-      return config
+          for pos in poses:
+            code.removeColors(pos, pos + len(match))
 
-    def show(content, foundHL = True):
-      print(f'\033[1;32m◈ {file}\033[0m:', end = '')
+            code.add(f'\033[{color}m', pos)
+            code.add(f'\033[0m', pos + len(match))
 
-      if foundHL == False:
-        print(f" \033[33mNo highlight found\033[0m")
-      else:
-        print('')
+    self.show(code.join())
 
-      print('  ' + '\n  '.join(content.split('\n')))
+  def show(self, content, foundHL = True) -> None:
+    file = self.current['file']
 
-    config = openf(f'{program_dir}/extensions.yml', loadConfig)
+    print('')
+    print(f'\033[1;32m◈ {file}\033[0m:', end = '')
 
-    with open(file, 'r') as content:
-      code = scd_str(''.join(content.readlines()) + '\n')
+    if foundHL == False:
+      print(f" \033[33mNo highlight found\033[0m")
+    else:
+      print('')
 
-      if config == False or config == None:
-        if config == None:
-          show(code.str, False)
+    print('  ' + '\n  '.join(content.split('\n')))
+    print('')
 
-        continue
+  def error(self, message) -> 1:
+    file = self.current['file']
+    configfile = self.current['config-file']
 
-      for group in config['groups']:
-        color = group['color']
-        regexes = []
+    lines = [
+      '',
+      f'\033[1;31m◈ {file}',
+      f'  \033[0;31m{self.program_relative_dir}/langs/{configfile}.yml\033[37m: Got an unexpected architecture',
+      f'  {message}',
+      '',
+      '  \033[1;37m◈ To more help',
+      '    \033[0;31mcatc \033[33m--help\033[0m',
+      ''
+    ]
 
-        if 'regex' in group.keys():
-          regexes.append(group['regex'])
+    for line in lines:
+      print(line)
 
-        if 'regexes' in group.keys():
-          regexes += group['regexes']
+    return 1
 
-        for regex in regexes:
-          matches = code.rmdup(re.findall(regex, code.str))
+  def loadConfig(self) -> int:
+    configfile = self.current['config-file']
+    config = {}
 
-          for match in matches:
-            poses = code.whereis(code.str, match)
+    config = openf(f'{self.program_dir}/langs/{configfile}.yml')
+    if config.status == False: return 2
 
-            for pos in poses:
-              code.removeColors(pos, pos + len(match))
+    config = yaml.safe_load( config.content )
 
-              code.add(f'\033[{color}m', pos)
-              code.add(f'\033[0m', pos + len(match))
+    # ◈ Validatting
+    if not 'colors' in config.keys():
+      config['colors'] = {}
+    elif type(config['colors']) is not dict:
+      return self.error("Colors isn't an object")
 
-      show(code.join())
+    if not 'groups' in config.keys():
+      return self.error("There's no groups object")
+    # elif type(config['groups']) is not list:
+      # return error("Groups isn't a list")
+
+    for group in config['groups']:
+      if not 'color' in group.keys():
+        return self.error("There's a group with no color")
+      if not 'regex' in group.keys() and not 'regexes' in group.keys():
+        return self.error("There's a group without regex and regexes")
+
+    # ◈ Calling color variables
+    for x in range(0, len(config['groups'])):
+      group = config['groups'][x]
+
+      if len( re.findall(r'^[0-9;]+$', str(group['color'])) ) == 0:
+        if group['color'] in config['colors'].keys():
+          config['groups'][x]['color'] = config['colors'][group['color']]
+        else:
+          config['groups'][x]['color'] = 37
+
+    self.current['config'] = config
+    return 0
+
 
 if __name__ == '__main__':
-  main()
+  fun = main()
+
+  for file in sys.argv[1:]:
+    fun(file)
