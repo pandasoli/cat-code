@@ -100,18 +100,26 @@ def main():
       config = openf(f'{program_dir}/langs/{at}.yml', setConfig)
       return config
 
-    config = openf(f'{program_dir}/extensions.yml', loadConfig)
+    def show(content, foundHL = True):
+      print(f'\033[1;32m◈ {file}\033[0m:', end = '')
 
-    if config == False or config == None:
-      if config == None:
-        print(f'\033[1;31m◈ {file}')
-        print(f"  \033[0;31m{program_relative_dir}/langs/{extension}.yml\033[37m: Doesn't exist")
+      if foundHL == False:
+        print(f" \033[33mNo syntax found\033[0m")
+      else:
         print('')
 
-      continue
+      print('  ' + '\n  '.join(content.split('\n')))
+
+    config = openf(f'{program_dir}/extensions.yml', loadConfig)
 
     with open(file, 'r') as content:
       code = scd_str(''.join(content.readlines()) + '\n')
+
+      if config == False or config == None:
+        if config == None:
+          show(code.str, False)
+
+        continue
 
       for group in config['groups']:
         color = group['color']
@@ -135,8 +143,7 @@ def main():
               code.add(f'\033[{color}m', pos)
               code.add(f'\033[0m', pos + len(match))
 
-      print(f'\033[1;32m◈ {file}\033[0m:')
-      print('  ' + '\n  '.join(code.join().split('\n')))
+      show(code.join())
 
 if __name__ == '__main__':
   main()
