@@ -5,7 +5,7 @@
   "object": {
     "string": "value",
     "boolean": true,
-    "key": "value"
+    "key": "\tvalue"
   },
   // array:
   "array": [

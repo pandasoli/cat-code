@@ -6,7 +6,7 @@ groups:
     regex: '[a-zA-Z0-9-_]+'
 
   - color: 35
-    # regex: '[a-zA-Z0-9-_]+:'
+    regex: '[a-zA-Z0-9-_]+:'
 
   - color: 31
     regexes:
@@ -26,4 +26,4 @@ groups:
   - color: 32
     regexes:
       - "'.+'"
-      - "\".+\""
+      - '".+"'

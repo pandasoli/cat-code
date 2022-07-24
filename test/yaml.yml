@@ -9,7 +9,8 @@ object:
   # simple comment
 # array:
 array:
-  - item1
-  - item2
+  - 'item1'
+  - "item2"
+  - item3
 
 # comment

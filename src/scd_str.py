@@ -94,7 +94,7 @@ class main:
     n = []
 
     for color in self.scdline_colors:
-      if color['pos'] <= start or color['pos'] > end:
+      if color['pos'] < start or color['pos'] > end:
         n.append(color)
 
     self.scdline_colors = n
@@ -114,6 +114,10 @@ class main:
     for color in self.scdline_colors:
       res = res[:color['pos'] + sumOfColors] + color['value'] + res[color['pos'] + sumOfColors:]
       sumOfColors += len(color['value'])
+
+    f = open(f'{self.program_dir}/[scd_str] join res.cache.txt', 'w')
+    f.write(res)
+    f.close()
 
     return res
 
