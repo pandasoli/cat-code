@@ -104,7 +104,7 @@ def main():
       print(f'\033[1;32m◈ {file}\033[0m:', end = '')
 
       if foundHL == False:
-        print(f" \033[33mNo syntax found\033[0m")
+        print(f" \033[33mNo highlight found\033[0m")
       else:
         print('')
 
