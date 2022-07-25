@@ -90,7 +90,7 @@ class main:
     file = self.current['file']
 
     print('')
-    print(f'\033[1;32m◈ {file}\033[0m:', end = '')
+    print(f'\033[1;32m✔ {file}\033[0m:', end = '')
 
     if foundHL == False:
       print(f" \033[33mNo highlight found\033[0m")
@@ -106,7 +106,7 @@ class main:
 
     lines = [
       '',
-      f'\033[1;31m◈ {file}',
+      f'\033[1;31m✗ {file}',
       f'  \033[0;31m{self.program_relative_dir}/langs/{configfile}.yml\033[37m: Got an unexpected architecture',
       f'  {message}',
       '',
@@ -163,7 +163,7 @@ class main:
 if __name__ == '__main__':
   if len(sys.argv) == 1:
     help()
-    return
+    exit()
 
   fun = main()
 

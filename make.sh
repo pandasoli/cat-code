@@ -36,12 +36,12 @@ instalation() {
 }
 
 success() {
-  echo -e '\033[1;32m◈ Installation completed\033[0m'
+  echo -e '\033[1;32m✔ Installation completed\033[0m'
   PATH="$HOME/my-path/cat-code:$PATH"
 }
 
 error() {
-  echo -e '\033[1;31m◈ Installation not completed\033[0m'
+  echo -e '\033[1;31m✘ Installation not completed\033[0m'
   echo -e "  \033[31mI don't know what the fuck was going on 🤔\033[0m"
 }
 
