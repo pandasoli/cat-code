@@ -2,14 +2,14 @@
 
 instalation() {
   # ◈ Folder my-path
-  if [ -f "~/my-path" ]; then
+  if [ -d "~/my-path" ]; then
     mkdir ~/my-path
   fi
 
   # ◈ Folder cat-code at my-path
-  if [ -d "~/my-path/cat-code" ]; then
+  if [ ! -d "~/my-path/cat-code" ]; then
     rm -r -f ~/my-path/cat-code/*
-  elif [ -f "~/my-path/cat-code" ]; then
+  else
     mkdir ~/my-path/cat-code
   fi
 
@@ -24,8 +24,8 @@ instalation() {
   profile_lines=(
     ''
     '# 🐈 Cat Code 🖤'
-    "if [ -d \"\$HOME/my-path/cat-code\" ]; then"
-    "  PATH=\"\$HOME/my-path/cat-code:\$PATH\""
+    'if [ -d "$HOME/my-path/cat-code" ]; then'
+    '  PATH="$HOME/my-path/cat-code:$PATH"'
     'fi'
     ''
   )
