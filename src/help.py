@@ -1,7 +1,37 @@
 import sys
+import highlight
 
 
 def main():
+  ccode = highlight().text
+
+  codes = {
+    'langs': [
+      '  colors: # optional',
+      '    # your color variables',
+      '    red: 31',
+      '    blue: 34',
+      '',
+      '  regexes:',
+      "    - color: 'red'      # calling a color variable",
+      '      regexes:          # this can be a list or not',
+      "        - '\\bfalse'",
+      "        - '\\btrue'",
+      '',
+      "    - color: 34         # blue color (doesn't call a variable)",
+      "      regex: '[a-zA-Z]'"
+    ],
+    'extensions': [
+      '  # "<extenssion>": "name of the yaml created at /langs"',
+      "  # OBS: it's not necessary the file name.",
+      '  c: cpp',
+      '  h: cpp'
+    ]
+  }
+
+  for code in codes.keys():
+    codes[code] = '\n'.join(codes[code])
+
   lines = [
     '',
     '🐈 \033[1;32mCat Code\033[0m 🖤',
@@ -14,31 +44,16 @@ def main():
     '  Github: \033[36mpandasoli',
     '',
     '◈ \033[1;37mHow to use',
-    '  \033[31mcatc \033[33m<...files>',
+    '  \033[31mcatc \033[33m...<file>:<?syntax>',
     '',
     '◈ \033[1;37mHow to create your own highlight',
     "Create a file called like 'lang.yml' in /langs",
     'Its template must be:',
-    '  \033[31mcolors\033[37m: \033[30m# optional',
-    '    \033[30m# your color variables',
-    '    \033[31mred\033[37m: \033[33m31',
-    '    \033[31mblue\033[37m: \033[33m34',
-    '',
-    '  \033[31mregexes\033[37m:',
-    "    - \033[31mcolor\033[37m: \033[32m'red'      \033[30m# calling a color variable",
-    '      \033[31mregexes\033[37m:          \033[30m# this can be a list or not',
-    "        - \033[32m'\\bfalse'",
-    "        - \033[32m'\\btrue'",
-    '',
-    "    - \033[31mcolor\033[37m: \033[33m34         \033[30m# blue color (doesn't call a variable)",
-    "      \033[31mregex\033[37m: \033[32m'[a-zA-Z]'",
+    ccode(codes['langs'], 'yaml')['res'],
     '',
     'If your language has more than one extenssion,',
     'in the file extensions.yml put this:',
-    '  \033[30m# "<extenssion>": "name of the yaml created at /langs"',
-    "  \033[30m# OBS: it's not necessary the file name.",
-    '  \033[31mc\033[37m: \033[32mcpp',
-    '  \033[31mh\033[37m: \033[32mcpp',
+    ccode(codes['extensions'], 'yaml')['res'],
     ''
   ]
 
