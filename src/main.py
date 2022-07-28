@@ -7,7 +7,7 @@ from types import NoneType
 from os import path
 
 import help
-import scd_str
+import sstr
 import openf
 
 
@@ -21,6 +21,24 @@ import openf
     Facebook: pandasoli.ofc
     Github: pandasoli
 '''
+
+def whereis(text, value) -> list:
+  res = []
+
+  for x in range(0, len(text)):
+    if text[x:x + len(value)] == value:
+      res.append(x)
+
+  return res
+
+def rmdup(arr) -> list:
+  res = []
+
+  for item in arr:
+    if item not in res:
+      res.append(item)
+
+  return res
 
 
 class main:
@@ -43,7 +61,7 @@ class main:
     extensions = yaml.safe_load( openf(f'{self.program_dir}/extensions.yml').content )
 
     self.current['config-file'] = extensions[extension] if extension in extensions else extension
-    configStatus = self.loadConfig() 
+    configStatus = self.loadConfig()
 
 
     fileOpen = openf(file)
@@ -54,7 +72,7 @@ class main:
       print('')
       return
 
-    code = scd_str(fileOpen.content)
+    code = sstr(fileOpen.content)
     config = self.current['config']
 
     if configStatus != 0:
@@ -73,13 +91,13 @@ class main:
         regexes += group['regexes']
 
       for regex in regexes:
-        matches = code.rmdup(re.findall(regex, code.str))
+        matches = rmdup(re.findall(regex, code.str))
 
         for match in matches:
-          poses = code.whereis(code.str, match)
+          poses = whereis(code.str, match)
 
           for pos in poses:
-            code.removeColors(pos, pos + len(match))
+            code.remove(pos, pos + len(match))
 
             code.add(f'\033[{color}m', pos)
             code.add(f'\033[0m', pos + len(match))
@@ -90,7 +108,7 @@ class main:
     file = self.current['file']
 
     print('')
-    print(f'\033[1;32m✔ {file}\033[0m:', end = '')
+    print(f'\033[1;32m✔ {file}:\033[0m', end = '')
 
     if foundHL == False:
       print(f" \033[33mNo highlight found\033[0m")
@@ -107,16 +125,16 @@ class main:
     lines = [
       '',
       f'\033[1;31m✗ {file}',
-      f'  \033[0;31m{self.program_relative_dir}/langs/{configfile}.yml\033[37m: Got an unexpected architecture',
+      f'  \033[31m{self.program_relative_dir}/langs/{configfile}.yml\033[37m: Got an unexpected architecture',
       f'  {message}',
       '',
       '  \033[1;37m◈ To more help',
-      '    \033[0;31mcatc \033[33m--help\033[0m',
+      '    catc \033[33m--help',
       ''
     ]
 
     for line in lines:
-      print(line)
+      print(f'{line}\033[0m')
 
     return 1
 
@@ -162,7 +180,15 @@ class main:
 
 if __name__ == '__main__':
   if len(sys.argv) == 1:
-    help()
+    lines = [
+      '',
+      f'\033[1;31m✗ No params found',
+      f'  Type: catc \033[33m--help',
+      ''
+    ]
+
+    for line in lines:
+      print(f'{line}\033[0m')
     exit()
 
   fun = main()
