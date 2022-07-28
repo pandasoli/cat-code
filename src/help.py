@@ -3,6 +3,7 @@ import sys
 
 def main():
   lines = [
+    '',
     '🐈 \033[1;32mCat Code\033[0m 🖤',
     'Repo: \033[36mhttps://github.com/pandasoli/cat-code',
     '',
@@ -37,15 +38,12 @@ def main():
     '  \033[30m# "<extenssion>": "name of the yaml created at /langs"',
     "  \033[30m# OBS: it's not necessary the file name.",
     '  \033[31mc\033[37m: \033[32mcpp',
-    '  \033[31mh\033[37m: \033[32mcpp'
+    '  \033[31mh\033[37m: \033[32mcpp',
+    ''
   ]
-
-  print('')
 
   for line in lines:
     print(f'{line}\033[0m')
-
-  print('')
 
 
 sys.modules[__name__] = main
