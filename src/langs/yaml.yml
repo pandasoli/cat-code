@@ -19,11 +19,12 @@ groups:
   - color: 36
     regexes:
       - ':'
-
-  - color: 'comment'
-    regex: '#.*'
+      - '-'
 
   - color: 32
     regexes:
       - "'.+'"
       - '".+"'
+
+  - color: 'comment'
+    regex: '#.*'
