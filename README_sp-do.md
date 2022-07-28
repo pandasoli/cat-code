@@ -25,6 +25,14 @@ Ahora solo ejecutes el comando:
     catc file.yml # ...archivos
   ```
 </div>
+
+Si quieres leer un archivo con otra syntax:
+<div align='left'>
+
+  ```sh
+    catc file.yml:json # archivo:syntax
+  ```
+</div>
 <br/>
 
 ## ◈ Como crear tu propia highlight
