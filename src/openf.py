@@ -7,6 +7,8 @@ class openf:
   status = False
 
   def __init__(self, filePath) -> bool:
+    self.content = ''
+
     if path.exists(filePath):
       f = open(filePath, 'r')
 
