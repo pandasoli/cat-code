@@ -2,9 +2,9 @@
   "string": "value",
   "boolean": false,
   "number": 2.0221,
-  "object": {
+  "object": {  // ,object,
     "string": "value",
-    "boolean": true,
+    "boolean": true, /* ijaso */
     "key": "\tvalue"
   },
   // array:
