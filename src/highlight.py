@@ -36,7 +36,6 @@ class highlight:
 
   current = {
     'file': '',
-    'extension': '',
     'config-file': '',
     'config': {}
   }
@@ -65,14 +64,10 @@ class highlight:
       res['res'] = text
       return res
 
-    self.current['extension'] = lang
-
-    extension = self.current['extension']
     extensions = yaml.safe_load( openf(f'{self.program_dir}/extensions.yml').content )
+    self.current['config-file'] = extensions[lang] if lang in extensions else lang
 
-    self.current['config-file'] = extensions[extension] if extension in extensions else extension
     warnings = self.loadConfig()
-
     code = sstr(text)
     config = self.current['config']
 
@@ -129,7 +124,7 @@ class highlight:
     lines = [
       '',
       f'\033[1;32m✔ {file}:',
-      '  ' + '\n  '.join(content.split('\n')),
+      '\033[32m➤\033[0m ' + '\n  '.join(content.split('\n')),
       ''
     ]
 
@@ -151,12 +146,12 @@ class highlight:
 
     for x in range(msgs_begin, len(msgs)):
       msg = msgs[x]
-      lines.append(f'  \033[33m{msg}')
+      lines.append(f'\033[33m╰─➤ {msg}')
 
     if len(msgs) > 0 and msgs_begin == 0:
       lines.append('')
 
-    lines.append('  ' + '\n  '.join(content.split('\n')))
+    lines.append('\033[33m➤\033[0m ' + '\n  '.join(content.split('\n')))
     lines.append('')
     return '\033[0m\n'.join(lines)
 
@@ -201,7 +196,7 @@ class highlight:
 
     if not 'groups' in config.keys():
       config['groups'] = {}
-      warnings.append("There's no groups object")
+      warnings.append("There's no groups list")
     elif type(config['groups']) is not list:
       config['groups'] = []
       warnings.append("Groups isn't a list")

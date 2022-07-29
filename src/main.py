@@ -6,6 +6,7 @@ import help
 import sstr
 import openf
 import highlight
+from os.path import isfile
 
 
 '''
@@ -35,16 +36,22 @@ def main():
   code = highlight()
 
   for file in sys.argv[1:]:
+    splited = file.split(':')
+    file = splited[0]
+    syntax = ''
+
+    if len(splited) > 1:
+      syntax = splited[1]
+
     if file == '--help' or file == '-h':
       help()
+    elif isfile(file) == False:
+      code.current['file'] = file
+
+      print(
+        code.error('Is not a file')
+      )
     else:
-      splited = file.split(':')
-      file = splited[0]
-      syntax = ''
-
-      if len(splited) > 1:
-        syntax = splited[1]
-
       res = code.file(file, syntax)
 
       if res['status'] == 0:
