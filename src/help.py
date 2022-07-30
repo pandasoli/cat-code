@@ -1,8 +1,60 @@
 import sys
+
 import highlight
+from libs.menu import Cursor
+from libs.menu import menu
+from libs import clear
 
 
 def main():
+  lines = [
+    '',
+    '🐈 \033[1;32mCat Code\033[0m 🖤',
+    'Repo: \033[36mhttps://github.com/pandasoli/cat-code',
+    ''
+  ]
+
+  for line in lines:
+    print(f'{line}\033[0m')
+
+  item = menu(
+    '',
+    [
+      '◈ \033[1;37mWho made: \033[33mPanda Soli',
+      '◈ \033[1;37mHow to use',
+      '◈ \033[1;37mHow to create your own highlight'
+    ],
+    False
+  )
+
+  lines = []
+
+  if item.status:
+    if item.selected['current'] == 0: lines = credits()
+    elif item.selected['current'] == 1: lines = howuse()
+    elif item.selected['current'] == 2: lines = createhighlight()
+
+    for line in lines:
+      print(f'{line}\033[0m')
+
+    print('')
+
+def credits():
+  return [
+    '◈ \033[1;37mWho made: \033[33mPanda Soli',
+    '  Whatsapp: \033[36m+55 51 9380 3517',
+    '  Instagram: \033[36m@pandasoli.ofc',
+    '  Facebook: \033[36mpandasoli.ofc',
+    '  Github: \033[36mpandasoli'
+  ]
+
+def howuse():
+  return [
+    '◈ \033[1;37mHow to use',
+    '  \033[31mcatc \033[33m...<file>:<?syntax>'
+  ]
+
+def createhighlight():
   ccode = highlight().text
 
   codes = {
@@ -32,20 +84,7 @@ def main():
   for code in codes.keys():
     codes[code] = '\n'.join(codes[code])
 
-  lines = [
-    '',
-    '🐈 \033[1;32mCat Code\033[0m 🖤',
-    'Repo: \033[36mhttps://github.com/pandasoli/cat-code',
-    '',
-    '◈ \033[1;37mWho made: \033[33mPanda Soli',
-    '  Whatsapp: \033[36m+55 51 9380 3517',
-    '  Instagram: \033[36m@pandasoli.ofc',
-    '  Facebook: \033[36mpandasoli.ofc',
-    '  Github: \033[36mpandasoli',
-    '',
-    '◈ \033[1;37mHow to use',
-    '  \033[31mcatc \033[33m...<file>:<?syntax>',
-    '',
+  return [
     '◈ \033[1;37mHow to create your own highlight',
     "Create a file called like 'lang.yml' in /langs",
     'Its template must be:',
@@ -54,11 +93,7 @@ def main():
     'If your language has more than one extenssion,',
     'in the file extensions.yml put this:',
     ccode(codes['extensions'], 'yaml')['res'],
-    ''
   ]
-
-  for line in lines:
-    print(f'{line}\033[0m')
 
 
 sys.modules[__name__] = main
