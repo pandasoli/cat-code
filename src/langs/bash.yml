@@ -1,0 +1,18 @@
+colors:
+  command: 31
+  param: 33
+  symbol: 36
+
+groups:
+  - color: command
+    regex: '^.* '
+
+  - color: symbol
+    regexes:
+      - ':'
+      - '/'
+      - '-'
+
+  - color: param
+    rewrite: false
+    regex: ' .*'
