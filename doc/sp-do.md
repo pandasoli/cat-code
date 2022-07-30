@@ -46,17 +46,17 @@ Su patrón debe ser:
   ```yml
     colors: # opcional
       # tus variables de color
-      red: 31
       blue: 34
 
     regexes:
-      - color: 'red'      # llamando a una variable de color
-        regex:            # eso puede ser una lista o no
-          - '\bfalse'
-          - '\btrue'
+      - color: blue          # llamando una variable de color
+      regexes:               # eso puede ser una lista o no
+        - '\\n'
+        - '\\t'
 
-      - color: 34         # color azul (no llama a una variable)
-        regex: '[a-zA-Z]'
+    - color: 32                   # color verde (no llama una variable)
+      rewrite: False              # limpar las colores dentro
+      regex: '"[a-zA-Z0-9\\_-]+"'
   ```
 </div>
 
