@@ -18,6 +18,11 @@ class sstr:
       if x in self.colors:
         del self.colors[x]
 
+  def replace(self, cl, start, end):
+    for x in range(start, end):
+      if x in self.colors and self.colors[x] == '\033[0m':
+        self.colors[x] = cl
+
   def join(self) -> str:
     res = self.str
     colors = dict( self.colors )
