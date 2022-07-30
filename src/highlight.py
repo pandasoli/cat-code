@@ -53,8 +53,6 @@ class highlight:
 
     self.extensions = yaml.safe_load(ofile.content)
 
-    pass
-
 
   # { status: int, warnings: list<str>, res: str }
   def text(self, text, lang = 'txt'):
@@ -73,6 +71,7 @@ class highlight:
 
     for group in config['groups']:
       color = group['color']
+      rewrite = group['rewrite']
       regexes = []
 
       if 'regex' in group.keys():
@@ -88,7 +87,10 @@ class highlight:
           poses = whereis(code.str, match)
 
           for pos in poses:
-            code.remove(pos, pos + len(match))
+            if rewrite:
+              code.remove(pos, pos + len(match))
+            else:
+              code.replace(f'\033[{color}m', pos, pos + len(match))
 
             code.add(f'\033[{color}m', pos)
             code.add(f'\033[0m', pos + len(match))
@@ -207,6 +209,8 @@ class highlight:
       if not 'color' in group.keys():
         config['groups'][x]['color'] = 37
         warnings.append("There's a group with no color")
+      if not 'rewrite' in group.keys():
+        config['groups'][x]['rewrite'] = True
       if not 'regex' in group.keys() and not 'regexes' in group.keys():
         config['groups'][x]['regex'] = ''
         warnings.append("There's a group without regex and regexes")
