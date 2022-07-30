@@ -6,6 +6,7 @@ import help
 import sstr
 import openf
 import highlight
+from os import path
 from os.path import isfile
 
 
@@ -45,27 +46,23 @@ def main():
 
     if file == '--help' or file == '-h':
       help(syntax)
-    elif isfile(file) == False:
+      continue
+
+    if path.exists(file) == False:
       code.current['file'] = file
+      print( code.error("Doesn't found") )
+      continue
 
-      print(
-        code.error('Is not a file')
-      )
-    else:
-      res = code.file(file, syntax)
+    if isfile(file) == False:
+      code.current['file'] = file
+      print( code.error('Is not a file') )
+      continue
 
-      if res['status'] == 0:
-        print(
-          code.show(res['res'])
-        )
-      elif res['status'] == 1:
-        print(
-          code.error("Doesn't found")
-        )
-      elif res['status'] == 2:
-        print(
-          code.warn(res['res'], res['warnings'])
-        )
+    res = code.file(file, syntax)
+
+    if res['status'] == 0: print( code.show(res['res']) )
+    elif res['status'] == 1: print( code.error("Doesn't found") )
+    elif res['status'] == 2: print( code.warn(res['res'], res['warnings']) )
 
 
 if __name__ == '__main__':
