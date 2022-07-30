@@ -21,19 +21,19 @@ from os.path import isfile
 '''
 
 def main():
+  code = highlight()
+
   if len(sys.argv) == 1:
     lines = [
       '',
       f'\033[1;31m✗ No params found:',
-      '  Type \033[31mcatc \033[33m--help\033[0m for help',
+      '  Type ' + code.text('catc --help', 'bash')['res'] + ' for help',
       ''
     ]
 
     for line in lines:
       print(f'{line}\033[0m')
     exit()
-
-  code = highlight()
 
   for file in sys.argv[1:]:
     splited = file.split(':')
