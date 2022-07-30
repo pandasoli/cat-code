@@ -1,5 +1,14 @@
 groups:
+  - color: 34
+    regexes:
+      - '\\b'
+      - '\\t'
+      - '\\n'
+      - '\\r'
+      - '\\0'
+
   - color: 32
+    rewrite: False
     regex: '"[a-zA-Z0-9\\_-]+"'
 
   - color: 33
@@ -21,11 +30,6 @@ groups:
       - '{'
       - '}'
       - ','
-      # - '\\b'
-      # - '\\t'
-      # - '\\n'
-      # - '\\r'
-      # - '\\0'
 
   - color: 30
     regexes:
