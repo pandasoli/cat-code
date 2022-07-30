@@ -5,17 +5,39 @@ from libs.menu import Cursor
 from libs.menu import menu
 from libs import clear
 
+ccode = highlight().text
 
-def main():
-  lines = [
+def main(page = ''):
+  def showPage(page):
+    lines = []
+
+    if page == 0: lines = credits()
+    elif page == 1: lines = howuse()
+    elif page == 2: lines = createhighlight()
+
+    for line in lines:
+      print(f'{line}\033[0m')
+
+    print('')
+
+  print(
     '',
     '🐈 \033[1;32mCat Code\033[0m 🖤',
     'Repo: \033[36mhttps://github.com/pandasoli/cat-code',
-    ''
-  ]
+    '',
+    sep = '\033[0m\n'
+  )
 
-  for line in lines:
-    print(f'{line}\033[0m')
+  if page != '':
+    id = -1
+
+    if page == 'who': id = 0
+    if page == 'how': id = 1
+    if page == 'light': id = 2
+
+    if id > -1:
+      showPage(id)
+      return
 
   item = menu(
     '',
@@ -27,17 +49,17 @@ def main():
     False
   )
 
-  lines = []
-
   if item.status:
-    if item.selected['current'] == 0: lines = credits()
-    elif item.selected['current'] == 1: lines = howuse()
-    elif item.selected['current'] == 2: lines = createhighlight()
-
-    for line in lines:
-      print(f'{line}\033[0m')
-
-    print('')
+    showPage(item.selected['current'])
+  else:
+    print(
+      "◈ \033[1;37mIf menu didn't work use:",
+      '  ' + ccode('catc -h:who', 'bash')['res'],
+      '  ' + ccode('catc -h:how', 'bash')['res'],
+      '  ' + ccode('catc -h:light', 'bash')['res'],
+      '',
+      sep = '\033[0m\n'
+    )
 
 def credits():
   return [
@@ -55,8 +77,6 @@ def howuse():
   ]
 
 def createhighlight():
-  ccode = highlight().text
-
   codes = {
     'langs': [
       '  colors: # optional',
