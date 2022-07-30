@@ -44,7 +44,7 @@ def main():
       syntax = splited[1]
 
     if file == '--help' or file == '-h':
-      help()
+      help(syntax)
     elif isfile(file) == False:
       code.current['file'] = file
 
