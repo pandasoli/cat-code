@@ -26,6 +26,9 @@ def rmdup(arr) -> list:
 
   return res
 
+def loop(arr):
+  return zip(range(len(arr)), arr)
+
 
 class highlight:
   user_path = path.expanduser('~')
@@ -69,9 +72,9 @@ class highlight:
     code = sstr(text)
     config = self.current['config']
 
-    for group in config['groups']:
+    def loadgp(group, end = '0'):
       color = group['color']
-      rewrite = group['rewrite']
+      children = group['children']
       regexes = []
 
       if 'regex' in group.keys():
@@ -87,13 +90,17 @@ class highlight:
           poses = whereis(code.str, match)
 
           for pos in poses:
-            if rewrite:
-              code.remove(pos, pos + len(match))
-            else:
-              code.replace(f'\033[{color}m', pos, pos + len(match))
+            code.remove(pos, pos + len(match))
 
             code.add(f'\033[{color}m', pos)
-            code.add(f'\033[0m', pos + len(match))
+            code.add(f'\033[{end}m', pos + len(match))
+
+      for child in children:
+        loadgp(child, color)
+
+    for group in config['groups']:
+      loadgp(group)
+
 
     if len(warnings) > 0: res['status'] = 2
     res['res'] = code.join()
@@ -190,6 +197,7 @@ class highlight:
       config = {}
 
     # ◈ Validatting
+
     if not 'colors' in config.keys():
       config['colors'] = {}
     elif type(config['colors']) is not dict:
@@ -203,27 +211,45 @@ class highlight:
       config['groups'] = []
       warnings.append("Groups isn't a list")
 
-    for x in range(0, len(config['groups'])):
-      group = config['groups'][x]
+    def validvals(group, x):
+      res = group
 
       if not 'color' in group.keys():
-        config['groups'][x]['color'] = 37
+        res['color'] = 37
         warnings.append("There's a group with no color")
-      if not 'rewrite' in group.keys():
-        config['groups'][x]['rewrite'] = True
+      if not 'children' in group.keys():
+        res['children'] = []
       if not 'regex' in group.keys() and not 'regexes' in group.keys():
-        config['groups'][x]['regex'] = ''
+        res['regex'] = ''
         warnings.append("There's a group without regex and regexes")
 
+      # didn't created this scanning
+      for x, val in loop(res['children']):
+        res['children'][x] = validvals(val, x)
+
+      return res
+
+    for x, val in loop(config['groups']):
+      config['groups'][x] = validvals(val, x)
+
     # ◈ Calling color variables
-    for x in range(0, len(config['groups'])):
-      group = config['groups'][x]
+
+    def callvars(group):
+      res = group
 
       if len( re.findall(r'^[0-9;]+$', str(group['color'])) ) == 0:
         if group['color'] in config['colors'].keys():
-          config['groups'][x]['color'] = config['colors'][group['color']]
+          res['color'] = config['colors'][group['color']]
         else:
-          config['groups'][x]['color'] = 37
+          res['color'] = 37
+
+      for x, val in loop(res['children']):
+        res['children'][x] = callvars(val)
+
+      return res
+
+    for x, val in loop(config['groups']):
+      config['groups'][x] = callvars(val)
 
     self.current['config'] = config
     return warnings
