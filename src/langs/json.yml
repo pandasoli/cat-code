@@ -1,18 +1,18 @@
 groups:
-  - color: 34
-    regexes:
-      - '\\b'
-      - '\\t'
-      - '\\n'
-      - '\\r'
-      - '\\0'
 
   - color: 32
-    rewrite: False
+    children:
+      - color: 34
+        regexes:
+          - '\\b'
+          - '\\t'
+          - '\\n'
+          - '\\r'
+          - '\\0'
     regex: '"[a-zA-Z0-9\\_-]+"'
 
   - color: 33
-    regex: '\b[0-9]+(?:\.[0-9]+)?'
+    regex: '\b[0-9e]+(?:\.[0-9e]+)?'
 
   - color: 35
     regex: '"[a-zA-Z0-9\\_-]+"?(?=:)'
@@ -33,5 +33,5 @@ groups:
 
   - color: 30
     regexes:
-      - '\/\/.*'
-      - '\/\*.*\*\/'
+      - '//.*'
+      - '\/\*[a-zA-Z \n]+\*\/'

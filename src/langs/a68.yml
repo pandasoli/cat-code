@@ -3,6 +3,7 @@ colors:
   blue: 34
   orange: 33
   green: 32
+  gray: 30
 
 groups:
   - color: orange
@@ -23,3 +24,8 @@ groups:
 
   - color: blue
     regex: '\bprint\b'
+
+  - color: gray
+    regexes:
+      - '#[a-zA-Z \n]+#'
+      - 'COMMENT[a-zA-Z \n]+END COMMENT'
