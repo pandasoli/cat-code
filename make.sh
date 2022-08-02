@@ -23,7 +23,7 @@ instalation() {
   # ◈ Writting .profile
   profile_lines=(
     ''
-    '# 🐈 Cat Code 🖤'
+    '# 🐈‍⬛️ Cat Code 🖤'
     'if [ -d "$HOME/my-path/cat-code" ]; then'
     '  PATH="$HOME/my-path/cat-code:$PATH"'
     'fi'
@@ -47,7 +47,7 @@ error() {
 
 
 echo ''
-echo -e '🐈 \033[1;32mCat Code\033[0m 🖤'
+echo -e '🐈‍⬛️ \033[1;32mCat Code\033[0m 🖤'
 echo ''
 (instalation) && (success) || (error)
 echo ''

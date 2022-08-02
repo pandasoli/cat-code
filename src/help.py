@@ -21,7 +21,7 @@ def main(page = ''):
 
   print(
     '',
-    '🐈 \033[1;32mCat Code\033[0m 🖤',
+    '🐈‍⬛️ \033[1;32mCat Code\033[0m 🖤',
     'Repo: \033[36mhttps://github.com/pandasoli/cat-code',
     '',
     sep = '\033[0m\n'
