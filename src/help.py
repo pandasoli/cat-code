@@ -1,9 +1,8 @@
 import sys
 
 import highlight
-from libs.menu import Cursor
 from libs.menu import menu
-from libs import clear
+
 
 ccode = highlight().text
 
