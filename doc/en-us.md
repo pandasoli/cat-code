@@ -44,19 +44,25 @@ Its template must be:
 <div align='left'>
 
   ```yml
-    colors: # optional
-      # your color variables
+    colors: # your color variables
       blue: 34
 
-    regexes:
-      - color: blue          # calling a color variable
-      regexes:               # this can be a list or not
-        - '\\n'
-        - '\\t'
-
-    - color: 32                   # green color (doesn't call a variable)
-      rewrite: False              # clear de colors inside
-      regex: '"[a-zA-Z0-9\\_-]+"'
+    groups:
+      # green color (not calling a variable)
+      - color: 32
+        # your regex
+        regex: '"[a-zA-Z0-9\\_-]+"'
+        # optional - a regexes list
+        regexes:
+          - '"[a-zA-Z0-9\\_-]+"'
+          - "'[a-zA-Z0-9\\\\_-]+'"
+        # group of children
+        children:
+          # calling a color variable
+          - color: blue
+            regexes:
+              - '\\n'
+              - '\\t'
   ```
 </div>
 

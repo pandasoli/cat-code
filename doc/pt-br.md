@@ -44,19 +44,25 @@ Seu padrão deve ser:
 <div align='left'>
 
   ```yml
-    colors: # opcional
-      # suas variáveis de cor
+    colors: # suas variáveis de cor
       blue: 34
 
-    regexes:
-      - color: blue          # chamando uma variável de cor
-      regexes:               # isso pode ser uma lista ou não
-        - '\\n'
-        - '\\t'
-
-    - color: 32                   # cor verde (não chama una variável)
-      rewrite: False              # limpar cores dentro
-      regex: '"[a-zA-Z0-9\\_-]+"'
+    groups:
+      # cor verde (não chama uma variável)
+      - color: 32
+        # seu regex
+        regex: '"[a-zA-Z0-9\\_-]+"'
+        # opcional - uma lista de regexes
+        regexes:
+          - '"[a-zA-Z0-9\\_-]+"'
+          - "'[a-zA-Z0-9\\\\_-]+'"
+        # groups filhos
+        children:
+          # chamando uma variável de cor
+          - color: blue
+            regexes:
+              - '\\n'
+              - '\\t'
   ```
 </div>
 
