@@ -4,18 +4,14 @@ groups:
     children:
       - color: 34
         regexes:
-          - '\\b'
-          - '\\t'
-          - '\\n'
-          - '\\r'
-          - '\\0'
-    regex: '"[a-zA-Z0-9\\_-]+"'
+          - '\\.'
+    regex: '"[^"]+"'
 
   - color: 33
     regex: '\b[0-9e]+(?:\.[0-9e]+)?'
 
   - color: 35
-    regex: '"[a-zA-Z0-9\\_-]+"?(?=:)'
+    regex: '"[^"]+"?(?=:)'
 
   - color: 31
     regexes:
