@@ -7,7 +7,7 @@ colors:
 
 groups:
   - color: orange
-    regex: '\b[0-9]+(?:\.[0-9]+)?'
+    regex: '\b[0-9]+(?:\.[0-9e]+)?'
 
   - color: purple
     regexes:
@@ -27,5 +27,5 @@ groups:
 
   - color: gray
     regexes:
-      - '#[a-zA-Z \n]+#'
-      - 'COMMENT[a-zA-Z \n]+END COMMENT'
+      - '#[^#]*#'
+      # - 'COMMENT[^#]*END COMMENT'
