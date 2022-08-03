@@ -1,0 +1,228 @@
+#!/usr/bin/a68g --script #
+# -*- coding: utf-8 -*- #
+
+#
+    TEST
+#
+
+COMMENT comment END COMMENT
+COMMENT
+  To run: 
+  - chmod ug+rx catc.a68; 
+  - ./catc.a68 file.a68
+
+  Or: 
+  - /usr/bin/a68g --script catc.a68 file.a68
+
+Bold symbols and reserved words
+
+The standard language contains about sixty reserved words, typically bolded in print, and some with "brief symbol" equivalents:
+
+END COMMENT
+
+OP FG = (INT i)STRING: REPR 27 + "[3" + whole(i,-2)[2:] + "m";
+OP BG = (INT i)STRING: REPR 27 + "[4" + whole(i,-2)[2:] + "m";
+
+STRING oc="", cc="";
+STRING 
+    fg black  = oc+FG 0,
+    fg red    = oc+FG 1,
+    fg green  = oc+FG 2,
+    fg yellow = oc+FG 3,
+    fg blue   = oc+FG 4,
+    fg magenta= oc+FG 5,
+    fg cyan   = oc+FG 6,
+    fg white  = oc+FG 7,
+    fg grey   = oc+FG 8,
+    fg default= FG 9+cc;
+
+STRING sep := "";
+
+STRING re word0 = "^([:upper:]+|[:lower:][:alnum:]+)$";
+STRING re word = "^[A-Z]+$";
+
+OP ESCWORD = (STRING s)STRING:
+    IF grep in string(re word, s, NIL, NIL) = 0 THEN "\b"+s+"\b" ELSE s FI;
+
+[]STRING symbol l = (
+"MODE", "OP", "PRIO", "PROC",
+"AT","@", "EITHER", "IS",":=:", "ISNT","IS NOT",":/=:",":≠:","OF","→", "TRUE", "FALSE", "EMPTY", "NIL","○", "SKIP","~",
+"CASE", "IN", "OUSE", "IN", "OUT", "ESAC",# "(, |, |:, |, |, )", #
+"FOR", "FROM", "TO", "BY", "WHILE", "DO", "OD",
+"IF", "THEN", "ELIF", "THEN", "ELSE", "FI",# "(, |, |:, |, |, )", #
+"PAR","BEGIN", "END","\(","\)", "GO TO", "GOTO", "EXIT","□"
+);
+
+STRING re symbol;
+sep := "";
+FOR s TO UPB symbol l DO
+    re symbol+:=sep+ESCWORD symbol l[s];
+    sep:="|"
+OD;
+
+
+[]STRING comment l = (
+"#[^#]*#","CO","¢", "COMMENT","¢", "PR", "PRAGMAT"
+);
+
+STRING re comment;
+sep := "";
+FOR s TO UPB comment l DO
+    re comment+:=sep+ESCWORD comment l[s];
+    sep:="|"
+OD;
+
+[]STRING primitive l = (
+"FLEX", "HEAP", "LOC", "LONG", "REF", "SHORT",
+"BITS", "BOOL", "BYTES", "CHAR", "COMPL", 
+"INT", "REAL", "SEMA", "STRING", "VOID",
+"CHANNEL", "FILE", "FORMAT", "STRUCT", "UNION"
+);
+
+[]STRING primitive0 l = ("INT");
+
+STRING re primitive;
+sep := "";
+FOR s TO UPB primitive l DO
+    re primitive+:=sep+ESCWORD primitive l[s];
+    sep:="|"
+OD;
+
+[]STRING op l = (
+#10 #  "NOT","UP","DOWN","LWB","UPB",
+#   #  "ABS","ARG","BIN","ENTIER","LENG","LEVEL","ODD","REPR","ROUND","SHORTEN",
+#   #  "¬","↑","↓","⌊","⌈","NORM","TRACE","T","DET","INV","LWS","UPS","⎩","⎧","BTB","CTB",
+# 9 # "[+][*]","I","[+]×","⊥","!",
+# 8 # "SHL","SHR","[*][*]","UP","DOWN","LWB","UPB","↑","↓","⌊","⌈","××","\^","LWS","UPS","⎩","⎧",
+# 7 # "[*]","/","%","OVER","%[*]","MOD","ELEM","×","÷","÷×","÷[*]","%×","□","÷:",
+# 6 # "-","[+]",
+# 5 # "<","LT","<=","LE",">=","GE",">","GT","≤","≥",
+# 4 # "EQ","=","NE","~=","/= ","≠","¬=",
+# 3 # "&","AND","∧","/\\",
+# 2 # "OR","∨","\\/",
+# 1 # "MINUSAB","PLUSAB","TIMESAB","DIVAB","OVERAB","MODAB","PLUSTO",
+      "-:=","[+]:=","[*]:=","/:=","%:=","%[*]:=","[+]=:",
+      "×:=","÷:=","÷×:=","÷[*]:=","%×:=","MINUS","PLUS","DIV","OVERB","MODB","÷::=","PRUS"
+);
+
+STRING re op;
+sep := "";
+
+FOR s TO UPB op l DO
+    re op+:=sep+ ESCWORD op l[s];
+    sep:="|"
+OD;
+
+STRING 
+    re bits   := "\b(2r[0-1]+|4r[0-3]+|8r[0-7]+|16r[0-9abcdef])\b",
+    re real   := "\b(([-+]{0,1}[0-9]+){0,1}[.]([0-9]*){0,1}([eE][-+]{0,1}[0-9]+){0,1}|0[.]|[.]0)\b",
+    re int    := "\b[-+]{0,1}[0-9][0-9 ]*[0-9]\b",
+    re bool   := "\b(TRUE|FALSE)\b",
+    # re name   := "\b[a-z_]([a-z0-9_ ]*[a-z0-9_]){0,1}\b", #
+    re name   := "\b[a-z][a-z0-9]*",
+    re string := """[^""]+""",
+    re format := "[$][^$]+[$]";
+
+[]STRUCT (STRING re, highlight) format l = (
+    (re comment,fg red),
+    (re symbol, fg red),
+    (re bits,   fg yellow),
+    (re real,   fg magenta),
+    (re int,    fg magenta),
+    (re bool,   fg green),
+    (re primitive,fg green),
+    (re name,   fg blue),
+    (re string, fg magenta),
+    (re format, fg green),
+    (re op, fg green)
+);
+
+STRING re tokenizer; 
+
+re tokenizer := ""; sep := "";
+
+FOR enum TO UPB format l DO
+    re tokenizer +:= sep + re OF format l[enum];
+    sep := "|"
+OD;
+
+# re tokenizer := re comment + "|" + re symbol + "|" + re primitive; #
+# re tokenizer := re primitive + "|" + re int; #
+
+PROC highlight token = (STRING token, REF FILE file out)VOID: (
+    FOR enum TO UPB format l DO
+        IF grep in string(re OF format l[enum], token, NIL, NIL) = 0 THEN
+            put(file out, (highlight OF format l[enum], token, fg default));
+            done
+        FI
+    OD;
+    put(file out, ("{", token, "}?"));
+done: ~
+);
+
+PROC highlight line = (STRING in line, REF FILE file out)VOID: (
+    STRING line tail := in line;
+    DO 
+        INT sub lwb:=99, sub upb:=99; INT lwb:=99, upb:=99;
+        INT match := grep in string(re tokenizer, line tail, lwb, upb);
+        IF match NE 0 THEN # no match #
+            put(file out, line tail);
+            done
+        ELSE # matched #
+            IF lwb > upb THEN 
+                putf(stand error, "Bug: BAD (short) RegExp in code!");
+                stop
+            FI;
+            put(file out, line tail[:lwb-1]);
+#            print((fg red,line tail[lwb:upb],fg default)); #
+            highlight token(line tail[lwb:upb], file out);
+            line tail := line tail[upb+1:]
+        FI
+    OD;
+done: ~
+);
+
+PROC highlight file= (REF FILE file in, file out)VOID: (
+    on logical file end(file in,(REF FILE mend me)BOOL: (done; TRUE));
+    DO
+        STRING line; get(file in,line);
+        highlight line(line, file out);
+        new line(file in);
+        new line(file out) 
+    OD;
+done: ~
+);
+
+PROC print error = (INT in error, STRING msg)VOID: 
+    putf(stand error,($"Error: "g(-0)" - "g$,in error,msg));
+
+# print((re tokenizer, new line)); #
+IF argc<4 THEN
+    highlight file(stand in, stand out)
+ELSE
+    FOR arg FROM 4 TO argc DO
+        print((argv(arg), new line));
+        FILE file; INT this errno=open(file, argv(arg), stand in channel);
+        IF this errno NE 0 THEN
+            print error(this errno, argv(arg))
+        ELSE
+            highlight file(file, stand out);
+            close(file)
+        FI
+    OD
+FI
+COMMENT
+CO test ESAC
+IF c THEN true ELSE false FI
+ FOR
+   CASE
+CO
+# print((re tokenizer, new line)); #
+REAL r = 1.2e3;
+INT  i = 123;
+BOOL b = TRUE;
+BITS o = 8r01234567;
+STRING s = "xx""yy";
+FORMAT f = $g(0)$; # cannot handle nested FORMATs #
+print((r,i,b,s,new line))
+END COMMENT

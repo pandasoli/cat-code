@@ -1,7 +1,19 @@
+#!/usr/bin/a68g --script #
+# -*- coding: utf-8 -*- #
+
+#
+    TEST
+#
+
+
 BEGIN
   FOR x FROM 0 TO 10 DO
-    print(( "The number right now is ", x ))
+    print(( "The #nu#mber right now is ", x ))
   OD;
+
+  COMMENT
+    Test big comment
+  END COMMENT
 
   # Test simple comment #
   print("between");
@@ -10,9 +22,11 @@ BEGIN
     Test simple comment with multiple lines
   #
 
-  print("between")
-  COMMENT
+  print("between");
+  # COMMENT
     Test big comment
-  END COMMENT
+  END COMMENT #
+
+  print("between")
 
 END

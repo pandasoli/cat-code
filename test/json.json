@@ -3,7 +3,7 @@
   "boolean": false,
   "number": 2.0e221,
   "object": {  // ,object,
-    "string": "value",
+    "string": "va//lue",
     "boolean": true, /*
       ijaso
     */
