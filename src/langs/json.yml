@@ -1,4 +1,6 @@
 groups:
+  - color: 33
+    regex: '\b[0-9e]+(?:\.[0-9e]+)?'
 
   - color: 32
     children:
@@ -6,9 +8,6 @@ groups:
         regexes:
           - '\\.'
     regex: '"[^"]+"'
-
-  - color: 33
-    regex: '\b[0-9e]+(?:\.[0-9e]+)?'
 
   - color: 35
     regex: '"[^"]+"?(?=:)'
