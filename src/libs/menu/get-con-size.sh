@@ -1,0 +1,1 @@
+echo "$(tput cols):$(tput lines)"

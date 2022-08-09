@@ -1,8 +1,7 @@
 import sys
-import re
 
 from libs.menu import Getch
-from libs.menu import Cursor
+from libs.menu import Console
 
 
 def loopItem(arr):
@@ -20,6 +19,7 @@ def repeat(str, times):
 class menu:
   items = []
   top = 0
+  console = None
   cursor = None
   status = False
   title = ''
@@ -28,31 +28,38 @@ class menu:
     'current': 0
   }
 
-  def __init__(self, title, items, showTitle = True):
-    if showTitle:
+  def __init__(self, title, items):
+    if title != '':
       print(f'\033[1;34m◈ {title}:\033[0m')
 
     self.title = f'◈ {title}:'
     self.items = []
     self.status = False
-    self.cursor = Cursor()
+    self.console = Console()
+    self.cursor = self.console.cursor
     self.top = self.cursor.get()['y']
 
     self.cursor.visible(False)
+
+    diff = (self.cursor.pos['y'] + len(items)) - (self.console.rows - 1)
+    if diff > 0:
+      self.top -= diff
+      for x in range(diff):
+        print('')
 
     for x, item in loopItem(items):
       self.items.append({ 'value': item, 'pos': self.top + x })
 
     self.load()
     self.loop()
-    self.end(showTitle)
+    self.end(title != '')
 
     self.cursor.set(0, self.top)
     self.cursor.visible(True)
 
 
   def end(self, showTitle = True):
-    for x, item in loopItem(self.items):
+    for item in self.items:
       value = item['value']
       pos = item['pos']
 
@@ -97,10 +104,10 @@ class menu:
     current = self.items[self.selected['current']]
 
     self.cursor.set(0, last['pos'])
-    print('\033[37m', last['value'], '\033[0m', sep = '')
+    print(' \033[37m', last['value'], '\033[0m', sep = '')
 
     self.cursor.set(0, current['pos'])
-    print('\033[4;37m', current['value'], '\033[0m', sep = '')
+    print(' \033[4;37m', current['value'], '\033[0m', sep = '')
 
   def load(self):
     for key, item in loopItem(self.items):
@@ -110,9 +117,9 @@ class menu:
       self.cursor.set(0, pos)
 
       if key == self.selected['current']:
-        print(f'\033[4;37m{value}\033[0m')
+        print(f' \033[4;37m{value}\033[0m')
       else:
-        print(f'\033[37m{value}\033[0m')
+        print(f' \033[37m{value}\033[0m')
 
 
 
