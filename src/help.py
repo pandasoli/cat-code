@@ -44,8 +44,7 @@ def main(page = ''):
       '◈ \033[1;37mWho made: \033[33mPanda Soli',
       '◈ \033[1;37mHow to use',
       '◈ \033[1;37mHow to create your own highlight'
-    ],
-    False
+    ]
   )
 
   if item.status:
