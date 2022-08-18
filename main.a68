@@ -1,3 +1,5 @@
+#!/bin/bash a68g main.a68 -- test.a68#
+
 BEGIN
   #
     1: Assign
@@ -201,18 +203,27 @@ BEGIN
 
 
   PROC highlight = ([] TOKEN tokens) VOID: (
-    FOR x FROM 1 TO UPB tokens DO
-      TOKEN token = tokens[x];
+    FOR i FROM 1 TO UPB tokens DO
+      TOKEN token = tokens[i];
 
-      IF   kind OF token = 1 THEN print(( cyan cl,       literal OF token, reset cl ))
-      ELIF kind OF token = 2 THEN print(( bold black cl, literal OF token, reset cl ))
-      ELIF kind OF token = 3 THEN print(( green cl,      literal OF token, reset cl ))
-      ELIF kind OF token = 4 THEN print(( yellow cl,     literal OF token, reset cl ))
-      ELIF kind OF token = 5 THEN print(( light cyan cl, literal OF token, reset cl ))
-      ELIF kind OF token = 6 THEN print(( red cl,        literal OF token, reset cl ))
-      ELIF kind OF token = 7 THEN print(( purple cl,     literal OF token, reset cl ))
-      ELIF kind OF token = 9 THEN print(( blue cl,       literal OF token, reset cl ))
-      ELSE                        print(( white cl,      literal OF token, reset cl ))
+      IF kind OF token = 1 THEN
+        print(( cyan cl, literal OF token, reset cl ))
+      ELIF kind OF token = 2 THEN
+        print(( bold black cl, literal OF token, reset cl ))
+      ELIF kind OF token = 3 THEN
+        print(( green cl, literal OF token, reset cl ))
+      ELIF kind OF token = 4 THEN
+        print(( yellow cl, literal OF token, reset cl ))
+      ELIF kind OF token = 5 THEN
+        print(( light cyan cl, literal OF token, reset cl ))
+      ELIF kind OF token = 6 THEN
+        print(( red cl, literal OF token, reset cl ))
+      ELIF kind OF token = 7 THEN
+        print(( purple cl, literal OF token, reset cl ))
+      ELIF kind OF token = 9 THEN
+        print(( blue cl, literal OF token, reset cl ))
+      ELSE
+        print(( white cl, literal OF token, reset cl ))
       FI
     OD
   );
@@ -224,35 +235,34 @@ BEGIN
 
       IF current file = "" THEN
         GO TO end
-      ELSE
+      FI;
+
+      FILE file;
+      INT exists = open (file, current file, stand in channel);
+
+      IF exists = 0 THEN
         STRING source := "  ";
-        FILE file;
+        on logical file end(file, (REF FILE skip) BOOL: done);
 
-        INT exists = open (file, current file, stand in channel);
+        DO
+          STRING line;
+          getf(file, ($gl$, line));
+          source +:= line + REPR 10 + "  "
+        OD;
 
-        IF exists = 0 THEN
-          on logical file end(file, (REF FILE skip) BOOL: done);
+        done:
+        source +:= REPR 10;
+        close(file);
 
-          DO
-            STRING line;
-            getf(file, ($gl$, line));
-            source +:= line + REPR 10 + "  "
-          OD;
+        print(( bold green cl, "✔ ", current file, ":", reset cl, new line ));
 
-          done:
-          source +:= REPR 10;
-          close(file);
+        highlight(
+          lexer(source)
+        );
 
-          print(( bold green cl, "✔ ", current file, ":", reset cl, new line ));
-
-          highlight(
-            lexer(source)
-          );
-
-          print( new line )
-        ELSE
-          print(( bold red cl, "✗ ", current file, ": ", red cl, "Doesn't exist", reset cl, new line ))
-        FI
+        print( new line )
+      ELSE
+        print(( bold red cl, "✗ ", current file, ": ", red cl, "Doesn't exist", reset cl, new line ))
       FI
     OD;
 
