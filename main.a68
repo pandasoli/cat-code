@@ -1,0 +1,242 @@
+BEGIN
+  #
+    1: Assign
+    2: Comment
+    3: String
+    4: Number
+    5: Brackets
+    6: Important
+    7: KeyWord
+    8: Unknown
+    9: Function
+  #
+
+  MODE TOKEN = STRUCT(
+    INT kind,
+    STRING literal
+  );
+
+  OP +:= = (REF STRING in out, CHAR item) VOID: in out := in out + item;
+  OP +:= = (REF STRING in out, STRING item) VOID: in out := in out + item;
+  OP +:= = (REF INT in out, INT item) VOID: in out := in out + item;
+
+  OP +:= = (REF FLEX [] TOKEN in out, TOKEN item) VOID: (
+    [1:UPB in out + 1] TOKEN new;
+    new[1:UPB in out] := in out;
+    new[UPB new] := item;
+    in out := new
+  );
+
+  OP +:= = (REF FLEX [] STRING in out, STRING item) VOID: (
+    [1:UPB in out + 1] STRING new;
+    new[1:UPB in out] := in out;
+    new[UPB new] := item;
+    in out := new
+  );
+
+
+  PROC sub str = (STRING str, INT from, INT len) STRING: (
+    STRING res := "";
+
+    FOR i FROM from TO from + len - 1 DO
+      res := res + str[i]
+    OD;
+
+    res
+  );
+
+  PROC str includes = (STRING includes, str) BOOL: (
+    BOOL res := FALSE;
+
+    FOR i FROM 1 TO UPB str - UPB includes + 1 DO
+      IF sub str(str, i, UPB includes) = includes THEN
+        res := TRUE;
+        GO TO done
+      FI
+    OD;
+    done:
+
+    res
+  );
+
+  PROC str arr includes = (STRING item, [] STRING arr) BOOL: (
+    BOOL res := FALSE;
+
+    FOR i FROM 1 TO UPB arr DO
+      IF arr[i] = item THEN
+        res := TRUE;
+        GO TO done
+      FI
+    OD;
+    done:
+
+    res
+  );
+
+
+  PROC lexer = (STRING source) FLEX [] TOKEN: (
+    INT counter := 1;
+    STRING last buff := "";
+    FLEX [ 0 ] TOKEN tokens;
+    FLEX [ 0 ] STRING indentifiers;
+
+    [] STRING key words = (
+      "FOR", "FROM", "GO", "TO", "WHILE", "IF", "THEN", "ELIF", "ELSE", "FI", "DO", "OD", "BEGIN", "END", "OF",
+      "PROC", "OP", "REF", "INT", "BOOL", "STRING", "CHAR", "BITS", "AND", "OR", "MODE", "STRUCT", "FILE"
+    );
+
+    WHILE UPB source > counter DO
+      CHAR ch := source[counter];
+
+      IF str includes(ch, ":+=-*/<>") THEN
+        tokens +:= TOKEN(1, ch);
+        counter +:= 1
+      ELIF ch = "#" THEN
+        STRING buff := ch;
+        counter +:= 1;
+
+        WHILE source[counter] /= ch AND counter < UPB source DO
+          buff +:= source[counter];
+          counter +:= 1
+        OD;
+
+        tokens +:= TOKEN(2, buff + ch);
+        counter +:= 1
+      ELIF ch = """" OR ch = "$" THEN
+        STRING buff := ch;
+        counter +:= 1;
+
+        WHILE source[counter] /= ch AND counter < UPB source DO
+          buff +:= source[counter];
+          counter +:= 1
+        OD;
+
+        tokens +:= TOKEN(3, buff + ch);
+        counter +:= 1
+      ELIF str includes(ch, "[]();,") THEN
+        tokens +:= TOKEN(5, ch);
+        counter +:= 1
+      ELIF str includes(ch, "0123456789") THEN
+        STRING buff := ch;
+        counter +:= 1;
+
+        DO
+          IF counter >= UPB source THEN
+            GO TO done
+          FI;
+
+          IF str includes(source[counter], "0123456789") = FALSE AND source[counter] /= "." THEN
+            GO TO done
+          FI;
+
+          buff +:= source[counter];
+          counter +:= 1
+        OD;
+        done:
+
+        tokens +:= TOKEN(4, buff)
+      ELIF str includes(ch, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") THEN
+        STRING buff := ch;
+        counter +:= 1;
+
+        WHILE str includes(source[counter], "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") OR str includes(source[counter], "0123456789") AND counter < UPB source DO
+          buff +:= source[counter];
+          counter +:= 1
+        OD;
+
+        INT kind := 8;
+
+        IF str arr includes(buff, key words) THEN
+          kind := 7
+        ELIF
+          buff = "VOID" OR
+          buff = "open" OR buff = "close" OR buff = "argv" OR
+
+          buff = "on" OR
+          last buff = "on" AND buff = "logical" OR
+          last buff = "logical" AND buff = "file" OR
+          last buff = "file" AND buff = "end"
+        THEN
+          kind := 3
+        ELIF buff = "new" OR buff = "line" THEN
+          kind := 4
+        ELIF buff = "FLEX" OR buff = "UPB" OR buff = "REPR" THEN
+          kind := 1
+        ELIF buff = "print" OR buff = "printf" OR buff = "get" OR buff = "getf" THEN
+          kind := 9
+        ELIF buff = "TRUE" OR buff = "FALSE" THEN
+          kind := 4
+        FI;
+
+        tokens +:= TOKEN(kind, buff);
+        last buff := buff
+      ELSE
+        tokens +:= TOKEN(8, ch);
+        counter +:= 1
+      FI
+
+    OD;
+
+    tokens
+  );
+
+
+  PROC highlight = ([] TOKEN tokens) VOID: (
+    STRING
+      reset cl = REPR 27 + "[0m",
+
+      black cl = REPR 27 + "[30m",
+      red cl = REPR 27 + "[31m",
+      green cl = REPR 27 + "[32m",
+      yellow cl = REPR 27 + "[33m",
+      blue cl = REPR 27 + "[34m",
+      purple cl = REPR 27 + "[35m",
+      cyan cl = REPR 27 + "[36m",
+      white cl = REPR 27 + "[37m",
+
+      light cyan cl = REPR 27 + "[2;36m",
+      light purple cl = REPR 27 + "[2;35m";
+
+    FOR x FROM 1 TO UPB tokens DO
+      TOKEN token = tokens[x];
+
+      IF   kind OF token = 1 THEN print(( cyan cl,       literal OF token, reset cl ))
+      ELIF kind OF token = 2 THEN print(( black cl,      literal OF token, reset cl ))
+      ELIF kind OF token = 3 THEN print(( green cl,      literal OF token, reset cl ))
+      ELIF kind OF token = 4 THEN print(( yellow cl,     literal OF token, reset cl ))
+      ELIF kind OF token = 5 THEN print(( light cyan cl, literal OF token, reset cl ))
+      ELIF kind OF token = 6 THEN print(( red cl,        literal OF token, reset cl ))
+      ELIF kind OF token = 7 THEN print(( purple cl,     literal OF token, reset cl ))
+      ELIF kind OF token = 9 THEN print(( blue cl,       literal OF token, reset cl ))
+      ELSE                        print(( white cl,      literal OF token, reset cl ))
+      FI
+    OD
+  );
+
+
+  PROC main = VOID: (
+    STRING source := "";
+    FILE file;
+
+    open (file, argv(4), stand in channel);
+    on logical file end(file, (REF FILE skip) BOOL: done);
+
+    DO
+      STRING line;
+      getf(file, ($gl$, line));
+      source +:= line + REPR 10
+    OD;
+
+    done:
+    source +:= REPR 10;
+    close(file);
+
+    highlight(
+      lexer(source)
+    )
+  );
+
+  main
+
+
+END
