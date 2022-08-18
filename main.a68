@@ -230,12 +230,8 @@ BEGIN
 
 
   PROC main = VOID: (
-    FOR i FROM 4 TO 99999 DO
+    FOR i FROM 4 TO argc DO
       STRING current file = argv(i);
-
-      IF current file = "" THEN
-        GO TO end
-      FI;
 
       FILE file;
       INT exists = open (file, current file, stand in channel);
