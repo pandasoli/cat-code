@@ -1,0 +1,12 @@
+BEGIN
+  # File for tests #
+
+  print((
+    """", argv(4), """", new line,
+    """", argv(5), """", new line
+  ));
+
+  PROC test proc = (STRING what) VOID: (
+    print( "nothing" )
+  )
+END
