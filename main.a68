@@ -34,6 +34,25 @@ BEGIN
     in out := new
   );
 
+  STRING
+    reset cl = REPR 27 + "[0m",
+
+    black cl = REPR 27 + "[0;30m",
+    red cl = REPR 27 + "[0;31m",
+    green cl = REPR 27 + "[0;32m",
+    yellow cl = REPR 27 + "[0;33m",
+    blue cl = REPR 27 + "[0;34m",
+    purple cl = REPR 27 + "[0;35m",
+    cyan cl = REPR 27 + "[0;36m",
+    white cl = REPR 27 + "[0;37m",
+
+    bold black cl = REPR 27 + "[1;30m",
+    bold red cl = REPR 27 + "[1;31m",
+    bold green cl = REPR 27 + "[1;32m",
+
+    light cyan cl = REPR 27 + "[2;36m",
+    light purple cl = REPR 27 + "[2;35m";
+
 
   PROC sub str = (STRING str, INT from, INT len) STRING: (
     STRING res := "";
@@ -182,26 +201,11 @@ BEGIN
 
 
   PROC highlight = ([] TOKEN tokens) VOID: (
-    STRING
-      reset cl = REPR 27 + "[0m",
-
-      black cl = REPR 27 + "[30m",
-      red cl = REPR 27 + "[31m",
-      green cl = REPR 27 + "[32m",
-      yellow cl = REPR 27 + "[33m",
-      blue cl = REPR 27 + "[34m",
-      purple cl = REPR 27 + "[35m",
-      cyan cl = REPR 27 + "[36m",
-      white cl = REPR 27 + "[37m",
-
-      light cyan cl = REPR 27 + "[2;36m",
-      light purple cl = REPR 27 + "[2;35m";
-
     FOR x FROM 1 TO UPB tokens DO
       TOKEN token = tokens[x];
 
       IF   kind OF token = 1 THEN print(( cyan cl,       literal OF token, reset cl ))
-      ELIF kind OF token = 2 THEN print(( black cl,      literal OF token, reset cl ))
+      ELIF kind OF token = 2 THEN print(( bold black cl, literal OF token, reset cl ))
       ELIF kind OF token = 3 THEN print(( green cl,      literal OF token, reset cl ))
       ELIF kind OF token = 4 THEN print(( yellow cl,     literal OF token, reset cl ))
       ELIF kind OF token = 5 THEN print(( light cyan cl, literal OF token, reset cl ))
@@ -215,25 +219,45 @@ BEGIN
 
 
   PROC main = VOID: (
-    STRING source := "";
-    FILE file;
+    FOR i FROM 4 TO 99999 DO
+      STRING current file = argv(i);
 
-    open (file, argv(4), stand in channel);
-    on logical file end(file, (REF FILE skip) BOOL: done);
+      IF current file = "" THEN
+        GO TO end
+      ELSE
+        STRING source := "  ";
+        FILE file;
 
-    DO
-      STRING line;
-      getf(file, ($gl$, line));
-      source +:= line + REPR 10
+        INT exists = open (file, current file, stand in channel);
+
+        IF exists = 0 THEN
+          on logical file end(file, (REF FILE skip) BOOL: done);
+
+          DO
+            STRING line;
+            getf(file, ($gl$, line));
+            source +:= line + REPR 10 + "  "
+          OD;
+
+          done:
+          source +:= REPR 10;
+          close(file);
+
+          print(( bold green cl, "✔ ", current file, ":", reset cl, new line ));
+
+          highlight(
+            lexer(source)
+          );
+
+          print( new line )
+        ELSE
+          print(( bold red cl, "✗ ", current file, ": ", red cl, "Doesn't exist", reset cl, new line ))
+        FI
+      FI
     OD;
 
-    done:
-    source +:= REPR 10;
-    close(file);
-
-    highlight(
-      lexer(source)
-    )
+    end:
+    print( new line )
   );
 
   main
