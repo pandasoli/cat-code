@@ -1,0 +1,19 @@
+BEGIN
+  INT error := 0;
+  CHAR esc = REPR 27;
+
+  PROC cursor get = STRUCT(INT x, y): (
+    CHAR in esc;
+    INT line, col;
+
+    print(esc+"[6n");
+    readf(( $a"["g(-0)";"g(-0)"r"$, in esc, out line, out col ));
+  );
+
+  error := system("stty raw -echo eol R");
+  cursor get(line, col);
+  error := system("stty cooked echo");
+
+  printf(($"current: line=",g(0),"; col=",g(0)l$,line,col))
+
+END
