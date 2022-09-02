@@ -1,31 +1,8 @@
-colors:
-  purple: 1;35
-  blue: 34
-  orange: 33
-  green: 32
-  gray: 30
-
-groups:
-  - color: orange
-    regex: '\b[0-9]+(?:\.[0-9e]+)?'
-
-  - color: purple
-    regexes:
-      - '\bFOR\b'
-      - '\bFROM\b'
-      - '\bTO\b'
-      - '\bDO\b'
-      - '\bOD\b'
-      - '\bBEGIN\b'
-      - '\bEND\b'
-
-  - color: green
-    regex: '".+"'
-
-  - color: blue
-    regex: '\bprint\b'
-
-  - color: gray
-    regexes:
-      - '#[^#]*#'
-      # - 'COMMENT[^#]*END COMMENT'
+keyword: '\b(FOR|FROM|TO|DO|OD|BEGIN|END)\b'
+math-char: (\+|-|=|\*|/|,|;|print)
+bracket: (\(|\))
+string: \".+\"
+number: \b[0-9]+(?:\.[0-9e]+)?
+comment: '(#[a-zA-Z0-9\/\n!\-\*: ]+#|COMMENT[a-zA-Z0-9\/\n!\-\*: ]+END COMMENT)'
+important: (TRUE|FALSE)
+identifier: '\w+'

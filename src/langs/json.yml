@@ -1,32 +1,8 @@
-groups:
-  - color: 33
-    regex: '\b[0-9e]+(?:\.[0-9e]+)?'
-
-  - color: 32
-    children:
-      - color: 34
-        regexes:
-          - '\\.'
-    regex: '"[^"]+"'
-
-  - color: 35
-    regex: '"[^"]+"?(?=:)'
-
-  - color: 31
-    regexes:
-      - '\bfalse'
-      - '\btrue'
-
-  - color: 34
-    regexes:
-      - ':'
-      - '\['
-      - ']'
-      - '{'
-      - '}'
-      - ','
-
-  - color: 30
-    regexes:
-      - '//.*'
-      - '\/\*[a-zA-Z \n]+\*\/'
+keyword: '"[^"]+"?(?=:)'
+math-char: (:|,)
+bracket: (\[|\]|\{|\})
+string: \".*\"
+number: \b[0-9e]+(?:\.[0-9e]+)?
+comment: (//.+|/\*[a-zA-Z\n ]+\*/)
+important: (true|false)
+identifier: '\w+'

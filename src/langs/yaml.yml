@@ -1,30 +1,8 @@
-colors:
-  comment: 30
-
-groups:
-  - color: 32
-    regex: '[a-zA-Z0-9-_]+'
-
-  - color: 35
-    regex: '[a-zA-Z0-9-_]+:'
-
-  - color: 31
-    regexes:
-      - '\bfalse'
-      - '\btrue'
-
-  - color: 33
-    regex: '\b[0-9]+(?:\.[0-9]+)?'
-
-  - color: 36
-    regexes:
-      - ':'
-      - '-'
-
-  - color: 32
-    regexes:
-      - "'.+'"
-      - '".+"'
-
-  - color: 'comment'
-    regex: '#.*'
+keyword: '([a-zA-Z0-9-_]+):'
+math-char: (-|:)
+bracket: (\[|\]|\{|\})
+number: \b[0-9e_]+(?:\.[0-9e_]+)?
+string: '\w+'
+comment: '#.+'
+important: (true|false)
+# identifier: '.+'
