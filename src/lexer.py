@@ -19,6 +19,8 @@ class TokenKind(enum.Enum):
   Error = 'Error'
   Warning = 'Warning'
 
+  Space = 'Space'
+
 
 class Token:
   def __init__(self, kind, literal):
@@ -38,6 +40,7 @@ class Lexer:
     while len(self.source) > self.counter:
       if   self.search('comment'):    tokens.append(self.do('comment',    TokenKind.Comment   ))
       elif self.search('warning'):    tokens.append(self.do('warning',    TokenKind.Warning   ))
+      elif self.search('space'):      tokens.append(self.do('space',      TokenKind.Space     ))
       elif self.search('error'):      tokens.append(self.do('error',      TokenKind.Error     ))
       elif self.search('bracket'):    tokens.append(self.do('bracket',    TokenKind.Bracket   ))
       elif self.search('math-char'):  tokens.append(self.do('math-char',  TokenKind.MathChar  ))
@@ -53,7 +56,7 @@ class Lexer:
           if self.counter > len(self.source) - 1:
             break
 
-          if self.search('comment') or self.search('warning') or self.search('error') or self.search('bracket') or self.search('math-char') or self.search('keyword') or self.search('string') or self.search('number') or self.search('important') or self.search('identifier'):
+          if self.search('comment') or self.search('warning') or self.search('space') or self.search('error') or self.search('bracket') or self.search('math-char') or self.search('keyword') or self.search('string') or self.search('number') or self.search('important') or self.search('identifier'):
             break
 
           buffer += self.current_char()
