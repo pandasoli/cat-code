@@ -5,4 +5,5 @@ number: \b[0-9e_]+(?:\.[0-9e_]+)?
 string: '\w+'
 comment: '#.+'
 important: (true|false)
-# identifier: '.+'
+identifier: '.+'
+space: '( |\n)'
