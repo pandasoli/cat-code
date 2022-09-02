@@ -1,0 +1,12 @@
+string: 34
+bracket: 2;37
+number: 1;34
+mathchar: 0
+important: 1;34
+keyword: 1;34
+comment: 1;30
+warning: 4;33
+error: 4;31
+identifier: 34
+unknown: 4;31
+space: 0

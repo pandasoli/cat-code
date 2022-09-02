@@ -1,0 +1,11 @@
+string: 33
+bracket: 0
+number: 35
+mathchar: 31
+important: 35
+keyword: 31
+comment: 1;30
+warning: 4;33
+error: 4;31
+identifier: 32
+unknown: 0
