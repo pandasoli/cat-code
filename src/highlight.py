@@ -5,7 +5,8 @@ from os import path
 from types import NoneType
 
 import openf
-import sstr
+from lexer import Lexer, TokenKind
+# import sstr
 
 
 def whereis(text, value) -> list:
@@ -58,57 +59,40 @@ class highlight:
 
 
   # { status: int, warnings: list<str>, res: str }
-  def text(self, text, lang = 'txt'):
+  def text(self, text, ext = 'txt') -> dict:
     res = { 'status': 0, 'warnings': [], 'res': '' }
 
-    if lang == 'txt':
+    if ext == 'txt':
       res['res'] = text
       return res
 
     extensions = yaml.safe_load( openf(f'{self.program_dir}/extensions.yml').content )
-    self.current['config-file'] = extensions[lang] if lang in extensions else lang
+    self.current['config-file'] = extensions[ext] if ext in extensions else ext
 
-    warnings = self.loadConfig()
-    code = sstr(text)
-    config = self.current['config']
+    config = self.loadConfig()
+    tokens = Lexer(text, config['config']).lex()
+    code = ''
 
-    def loadgp(group, end = '0'):
-      color = group['color']
-      children = group['children']
-      regexes = []
+    for tk in tokens:
+      if   tk.kind == TokenKind.String:      code += f'\033[32m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Bracket:     code += f'\033[2;36m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Number:      code += f'\033[33m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.MathChar:    code += f'\033[36m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Important:   code += f'\033[31m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.KeyWord:     code += f'\033[2;35m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Comment:     code += f'\033[1;30m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Warning:     code += f'\033[4;33m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Error:       code += f'\033[4;31m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Identifier:  code += f'\033[35m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Unknown:     code += f'\033[0m{tk.literal}\033[0m'
 
-      if 'regex' in group.keys():
-        regexes.append(group['regex'])
-
-      if 'regexes' in group.keys():
-        regexes += group['regexes']
-
-      for regex in regexes:
-        matches = rmdup(re.findall(regex, code.str))
-
-        for match in matches:
-          poses = whereis(code.str, match)
-
-          for pos in poses:
-            code.remove(pos, pos + len(match))
-
-            code.add(f'\033[{color}m', pos)
-            code.add(f'\033[{end}m', pos + len(match))
-
-      for child in children:
-        loadgp(child, color)
-
-    for group in config['groups']:
-      loadgp(group)
-
-
-    if len(warnings) > 0: res['status'] = 2
-    res['res'] = code.join()
-    res['warnings'] = warnings
+    if len(config['warnings']) > 0: res['status'] = 2
+    res['res'] = code
+    res['warnings'] = config['warnings']
     return res
 
   # { status: int, warnings: list<str>, res: str }
-  def file(self, file, lang = ''):
+  def file(self, file, lang = '') -> dict:
     self.current['file'] = file
     res = { 'status': True, 'warnings': [], 'res': '' }
 
@@ -126,8 +110,7 @@ class highlight:
     return res
 
 
-  # str
-  def show(self, content):
+  def show(self, content) -> str:
     file = self.current['file']
 
     lines = [
@@ -139,8 +122,7 @@ class highlight:
 
     return '\033[0m\n'.join(lines)
 
-  # str
-  def warn(self, content, msgs):
+  def warn(self, content, msgs) -> str:
     file = self.current['file']
     msgs_begin = 0
 
@@ -164,8 +146,7 @@ class highlight:
     lines.append('')
     return '\033[0m\n'.join(lines)
 
-  # str
-  def error(self, msg):
+  def error(self, msg) -> str:
     file = self.current['file']
 
     lines = [
@@ -177,12 +158,13 @@ class highlight:
     return '\033[0m\n'.join(lines)
 
 
-  # list<str>
-  def loadConfig(self):
+  # { warnings: list<str>, config: ... } }
+  def loadConfig(self) -> dict:
     configfile = self.current['config-file']
     warnings = []
     config = {}
 
+    # ◈ Openning
     config = openf(f'{self.program_dir}/langs/{configfile}.yml')
     if config.status == False:
       config = { 'colors': [], 'groups': [] }
@@ -196,63 +178,10 @@ class highlight:
     if type(config) is NoneType:
       config = {}
 
-    # ◈ Validatting
-
-    if not 'colors' in config.keys():
-      config['colors'] = {}
-    elif type(config['colors']) is not dict:
-      config['colors'] = {}
-      warnings.append("Colors isn't an object")
-
-    if not 'groups' in config.keys():
-      config['groups'] = {}
-      warnings.append("There's no groups list")
-    elif type(config['groups']) is not list:
-      config['groups'] = []
-      warnings.append("Groups isn't a list")
-
-    def validvals(group, x):
-      res = group
-
-      if not 'color' in group.keys():
-        res['color'] = 37
-        warnings.append("There's a group with no color")
-      if not 'children' in group.keys():
-        res['children'] = []
-      if not 'regex' in group.keys() and not 'regexes' in group.keys():
-        res['regex'] = ''
-        warnings.append("There's a group without regex and regexes")
-
-      # didn't created this scanning
-      for x, val in loop(res['children']):
-        res['children'][x] = validvals(val, x)
-
-      return res
-
-    for x, val in loop(config['groups']):
-      config['groups'][x] = validvals(val, x)
-
-    # ◈ Calling color variables
-
-    def callvars(group):
-      res = group
-
-      if len( re.findall(r'^[0-9;]+$', str(group['color'])) ) == 0:
-        if group['color'] in config['colors'].keys():
-          res['color'] = config['colors'][group['color']]
-        else:
-          res['color'] = 37
-
-      for x, val in loop(res['children']):
-        res['children'][x] = callvars(val)
-
-      return res
-
-    for x, val in loop(config['groups']):
-      config['groups'][x] = callvars(val)
-
-    self.current['config'] = config
-    return warnings
+    return {
+      'warnings': warnings,
+      'config': config
+    }
 
 
 sys.modules[__name__] = highlight

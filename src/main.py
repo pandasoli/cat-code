@@ -3,8 +3,6 @@
 import sys
 
 import help
-import sstr
-import openf
 import highlight
 from os import path
 from os.path import isfile
