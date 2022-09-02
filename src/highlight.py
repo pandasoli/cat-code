@@ -71,10 +71,9 @@ class highlight:
       res['res'] = text
       return res
 
-    # extensions = yaml.safe_load( openf(f'{self.program_dir}/config.yml').content )
-    # self.current['config-file'] = self.config['extensions'][ext] if ext in self.config['extensions'] else ext
-
-    config = self.loadConfig(ext)
+    config = self.loadConfig(
+      self.config['extensions'][ext] if ext in self.config['extensions'] else ext
+    )
     tokens = Lexer(text, config['config']).lex()
     code = ''
 
