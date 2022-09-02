@@ -58,9 +58,9 @@ def main():
 
     res = code.file(file, syntax)
 
-    if res['status'] == 0: print( code.show(res['res']) )
-    elif res['status'] == 1: print( code.error("Doesn't found") )
-    elif res['status'] == 2: print( code.warn(res['res'], res['warnings']) )
+    if res['status'] == 0: print( code.show(file, res['res']) )
+    elif res['status'] == 1: print( code.error(file, "Doesn't found") )
+    elif res['status'] == 2: print( code.warn(file, res['res'], res['warnings']) )
 
 
 if __name__ == '__main__':
