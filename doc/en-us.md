@@ -22,7 +22,7 @@ Now just run the command:
 <div align='left'>
 
   ```sh
-    catc file.yml # ...files
+    catc <...files>
   ```
 </div>
 
@@ -44,38 +44,30 @@ Its template must be:
 <div align='left'>
 
   ```yml
-    colors: # your color variables
-      blue: 34
-
-    groups:
-      # green color (not calling a variable)
-      - color: 32
-        # your regex
-        regex: '"[a-zA-Z0-9\\_-]+"'
-        # optional - a regexes list
-        regexes:
-          - '"[a-zA-Z0-9\\_-]+"'
-          - "'[a-zA-Z0-9\\\\_-]+'"
-        # group of children
-        children:
-          # calling a color variable
-          - color: blue
-            regexes:
-              - '\\n'
-              - '\\t'
+    keyword: (let|const|return)
+    math-char: (<|>|\+|\-|\*|\/|\%|\=|\:|\.|\,|\||\&|\w+:)
+    bracket: (\[|\]|\{|\}|\(|\))
+    string: ('.*'|".*"|`.*`)
+    number: \\b[0-9e_]+(?:\.[0-9e_]+)?
+    important: (this)
+    comment: (//.+|/\*[a-zA-Z\n ]+\*/)
+    identifier: '\w+'
+    space: '( |\n)'
   ```
 </div>
 
-If your language has more than one extenssion, in the file  
-extensions.yml put this:
+The `config.yml` file is for the themes and if your  
+your language has more than one extenssion, the syntax  
+of this file is thus:
 
 <div align='left'>
 
   ```yml
-    # "extenssion": "name of the .yml file created at /langs"
-    # OBS: it's not necessary the file name.
-    c: cpp
-    h: cpp
+    theme: 'nordic-darker'
+    extensions:
+      c: cpp
+      h: cpp
+      hpp: cpp
   ```
 </div>
 </div>

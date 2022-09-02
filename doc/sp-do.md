@@ -22,7 +22,7 @@ Ahora solo ejecutes el comando:
 <div align='left'>
 
   ```sh
-    catc file.yml # ...archivos
+    catc <...archivos>
   ```
 </div>
 
@@ -44,38 +44,32 @@ Su patrón debe ser:
 <div align='left'>
 
   ```yml
-    colors: # tus variables de color
-      blue: 34
-
-    groups:
-      # color verde (no llama una variable)
-      - color: 32
-        # tu regex
-        regex: '"[a-zA-Z0-9\\_-]+"'
-        # opcional - una lista de regexes
-        regexes:
-          - '"[a-zA-Z0-9\\_-]+"'
-          - "'[a-zA-Z0-9\\\\_-]+'"
-        # groups hijos
-        children:
-          # llamando una variavel de color
-          - color: blue
-            regexes:
-              - '\\n'
-              - '\\t'
+    keyword: (let|const|return)
+    math-char: (<|>|\+|\-|\*|\/|\%|\=|\:|\.|\,|\||\&|\w+:)
+    bracket: (\[|\]|\{|\}|\(|\))
+    string: ('.*'|".*"|`.*`)
+    number: \\b[0-9e_]+(?:\.[0-9e_]+)?
+    important: (this)
+    comment: (//.+|/\*[a-zA-Z\n ]+\*/)
+    identifier: '\w+'
+    space: '( |\n)'
   ```
 </div>
 
-Si tu linguaje tiene más que una extensión, en el archivo  
-extensions.yml ponha eso:
+<!-- Si tu linguaje tiene más que una extensión, en el archivo  
+extensions.yml ponha eso: -->
+El archivo `config.yml` sirve para temas y para si  
+tu linguaje tiene mais de una extension, la syntax  
+desto archivo es así:
 
 <div align='left'>
 
   ```yml
-    # "extensión": "nombre del archivo .yml creado en /langs"
-    # OBS: no es necesário lo nombre del archivo.
-    c: cpp
-    h: cpp
+    theme: 'nordic-darker'
+    extensions:
+      c: cpp
+      h: cpp
+      hpp: cpp
   ```
 </div>
 </div>
