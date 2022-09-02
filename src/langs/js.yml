@@ -1,8 +1,9 @@
 keyword: (let|const|return)
-math-char: (\+|\-|\*|\/|\%|\=|\:|\.|\,|\||\&|\w+:)
+math-char: (<|>|\+|\-|\*|\/|\%|\=|\:|\.|\,|\||\&|\w+:)
 bracket: (\[|\]|\{|\}|\(|\))
 string: ('.*'|".*"|`.*`)
 number: \\b[0-9e_]+(?:\.[0-9e_]+)?
 important: (this)
 comment: (//.+|/\*[a-zA-Z\n ]+\*/)
 identifier: '\w+'
+space: '( |\n)'
