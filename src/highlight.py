@@ -6,7 +6,6 @@ from types import NoneType
 
 import openf
 from lexer import Lexer, TokenKind
-# import sstr
 
 
 def whereis(text, value) -> list:
@@ -36,26 +35,32 @@ class highlight:
   program_dir = path.dirname(path.realpath(__file__))
   program_relative_dir = re.sub(fr'^{user_path}', '~', program_dir)
 
-  extensions = {}
-
-  current = {
-    'file': '',
-    'config-file': '',
-    'config': {}
-  }
+  config = {}
 
   def __init__(self) -> None:
-    ofile = openf(f'{self.program_dir}/extensions.yml')
+    config_file = openf(f'{self.program_dir}/config.yml')
 
-    if ofile.status == False:
+    if config_file.status == False:
       print('')
       print('\033[1;31m◈ Dependency not found')
-      print(f'  \033[0;31mNot found: \033[0m{self.program_relative_dir}/extensions.yml')
+      print(f'  \033[0;31mNot found: \033[0m{self.program_relative_dir}/config.yml')
       print('')
 
       exit()
 
-    self.extensions = yaml.safe_load(ofile.content)
+    self.config = yaml.safe_load(config_file.content)
+    theme = self.config['theme']
+    theme_file = openf(f'{self.program_dir}/themes/{theme}.yml')
+
+    if theme_file.status == False:
+      print('')
+      print('\033[1;31m◈ Dependency not found')
+      print(f'  \033[0;31mNot found: \033[0m{self.program_relative_dir}/themes/{theme}.yml')
+      print('')
+
+      exit()
+
+    self.config['theme'] = yaml.safe_load(theme_file.content)
 
 
   # { status: int, warnings: list<str>, res: str }
@@ -66,25 +71,40 @@ class highlight:
       res['res'] = text
       return res
 
-    extensions = yaml.safe_load( openf(f'{self.program_dir}/extensions.yml').content )
-    self.current['config-file'] = extensions[ext] if ext in extensions else ext
+    # extensions = yaml.safe_load( openf(f'{self.program_dir}/config.yml').content )
+    # self.current['config-file'] = self.config['extensions'][ext] if ext in self.config['extensions'] else ext
 
-    config = self.loadConfig()
+    config = self.loadConfig(ext)
     tokens = Lexer(text, config['config']).lex()
     code = ''
 
+    string_cl     = self.config['theme']['string']
+    bracket_cl    = self.config['theme']['bracket']
+    number_cl     = self.config['theme']['number']
+    mathchar_cl   = self.config['theme']['mathchar']
+    important_cl  = self.config['theme']['important']
+    keyword_cl    = self.config['theme']['keyword']
+    comment_cl    = self.config['theme']['comment']
+    warning_cl    = self.config['theme']['warning']
+    error_cl      = self.config['theme']['error']
+    identifier_cl = self.config['theme']['identifier']
+    unknown_cl    = self.config['theme']['unknown']
+    space_cl      = self.config['theme']['space']
+
     for tk in tokens:
-      if   tk.kind == TokenKind.String:      code += f'\033[32m{tk.literal}\033[0m'
-      elif tk.kind == TokenKind.Bracket:     code += f'\033[2;36m{tk.literal}\033[0m'
-      elif tk.kind == TokenKind.Number:      code += f'\033[33m{tk.literal}\033[0m'
-      elif tk.kind == TokenKind.MathChar:    code += f'\033[36m{tk.literal}\033[0m'
-      elif tk.kind == TokenKind.Important:   code += f'\033[31m{tk.literal}\033[0m'
-      elif tk.kind == TokenKind.KeyWord:     code += f'\033[2;35m{tk.literal}\033[0m'
-      elif tk.kind == TokenKind.Comment:     code += f'\033[1;30m{tk.literal}\033[0m'
-      elif tk.kind == TokenKind.Warning:     code += f'\033[4;33m{tk.literal}\033[0m'
-      elif tk.kind == TokenKind.Error:       code += f'\033[4;31m{tk.literal}\033[0m'
-      elif tk.kind == TokenKind.Identifier:  code += f'\033[35m{tk.literal}\033[0m'
-      elif tk.kind == TokenKind.Unknown:     code += f'\033[0m{tk.literal}\033[0m'
+      print('"' + tk.literal + '"', tk.kind)
+      if   tk.kind == TokenKind.String:     code += f'\033[{string_cl}m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Bracket:    code += f'\033[{bracket_cl}m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Number:     code += f'\033[{number_cl}m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.MathChar:   code += f'\033[{mathchar_cl}m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Important:  code += f'\033[{important_cl}m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.KeyWord:    code += f'\033[{keyword_cl}m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Comment:    code += f'\033[{comment_cl}m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Warning:    code += f'\033[{warning_cl}m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Error:      code += f'\033[{error_cl}m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Identifier: code += f'\033[{identifier_cl}m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Space:      code += f'\033[{space_cl}m{tk.literal}\033[0m'
+      elif tk.kind == TokenKind.Unknown:    code += f'\033[{unknown_cl}m{tk.literal}\033[0m'
 
     if len(config['warnings']) > 0: res['status'] = 2
     res['res'] = code
@@ -93,7 +113,6 @@ class highlight:
 
   # { status: int, warnings: list<str>, res: str }
   def file(self, file, lang = '') -> dict:
-    self.current['file'] = file
     res = { 'status': True, 'warnings': [], 'res': '' }
 
     fopen = openf(file)
@@ -110,9 +129,7 @@ class highlight:
     return res
 
 
-  def show(self, content) -> str:
-    file = self.current['file']
-
+  def show(self, file, content) -> str:
     lines = [
       '',
       f'\033[1;32m✔ {file}:',
@@ -122,8 +139,7 @@ class highlight:
 
     return '\033[0m\n'.join(lines)
 
-  def warn(self, content, msgs) -> str:
-    file = self.current['file']
+  def warn(self, file, content, msgs) -> str:
     msgs_begin = 0
 
     lines = [
@@ -146,9 +162,7 @@ class highlight:
     lines.append('')
     return '\033[0m\n'.join(lines)
 
-  def error(self, msg) -> str:
-    file = self.current['file']
-
+  def error(self, file, msg) -> str:
     lines = [
       '',
       f"\033[1;31m✗ {file}: \033[0;31m{msg}",
@@ -159,19 +173,20 @@ class highlight:
 
 
   # { warnings: list<str>, config: ... } }
-  def loadConfig(self) -> dict:
-    configfile = self.current['config-file']
+  def loadConfig(self, ext) -> dict:
     warnings = []
     config = {}
 
     # ◈ Openning
-    config = openf(f'{self.program_dir}/langs/{configfile}.yml')
+    config = openf(f'{self.program_dir}/langs/{ext}.yml')
     if config.status == False:
       config = { 'colors': [], 'groups': [] }
-      self.current['config'] = config
 
       warnings.append('Not found syntax file')
-      return warnings
+      return {
+        'warnings': warnings,
+        'config': config
+      }
 
     config = yaml.safe_load(config.content)
 
