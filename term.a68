@@ -1,0 +1,14 @@
+PROC get cursor pos = POS: (
+  CHAR in esc;
+  INT line, col;
+
+  VOID( system("stty raw -echo eol R") );
+
+  print(esc + "[6n");
+  readf(( $a"["g(-0)";"g(-0)"r"$, in esc, line, col ));
+
+  VOID( system("stty cooked echo") );
+
+  (col, line)
+)
+

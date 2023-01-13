@@ -1,0 +1,181 @@
+INT
+  assign token = 1,
+  comment token = 2,
+  string token = 3,
+  number token = 4,
+  brackets token = 5,
+  important token = 6,
+  keyword token = 7,
+  unknown token = 8,
+  function token = 9;
+
+
+PROC lexer = (STRING source, PROC (INT, BOOL) VOID callback) [] TOKEN: (
+  INT counter := 1;
+  CHAR current := " ";
+
+  # Defaults #
+
+  [] STRING key words = (
+    "FOR", "FROM", "BY", "PAR", "GO", "TO", "WHILE", "IF", "THEN", "ELIF", "ELSE", "FI", "DO", "OD", "BEGIN", "END", "OF",
+    "PROC", "OP", "REF", "INT", "BOOL", "STRING", "CHAR", "BITS", "AND", "OR", "MODE", "STRUCT", "FILE", "PR"
+  );
+
+  [] STRING sys funcs = (
+    "print", "print", "printf", "put", "putf", "read", "read char", "get", "getf", "whole", "system", "on logical file end",
+    "open", "close", "argc", "argv", "new line", "newline", "include", "UPB"
+  );
+
+  # Functions #
+
+  PROC next = REF CHAR: (
+    current := source[counter];
+    counter +:= 1;
+
+    current
+  );
+
+  PROC next some = (INT count) REF CHAR: (
+    TO count DO
+      next
+    OD;
+
+    current
+  );
+
+  PROC back = REF CHAR: (
+    counter -:= 2;
+    next;
+
+    current
+  );
+
+  PROC back some = (INT count) REF CHAR: (
+    TO count DO
+      back
+    OD;
+
+    current
+  );
+
+  PROC get word = STRING: (
+    STRING word := "";
+
+    WHILE str includes(next, alphabet + digits) AND counter < UPB source DO
+      word +:= current
+    OD;
+    back;
+
+    word
+  );
+
+  # Loops #
+
+  PROC lex = TOKEN: (
+    current := next;
+    STRING buff := current;
+    TOKEN res := (-1, "");
+
+    # Assignments #
+    IF str includes(current, ":+=-*/<>") THEN
+      res := TOKEN(assign token, buff)
+
+    # Brackets #
+    ELIF str includes(current, "[]();,") THEN
+      res := TOKEN(brackets token, buff)
+
+    # Comments #
+    ELIF current = "#" THEN
+      WHILE next /= "#" AND counter < UPB source DO
+        buff +:= current
+      OD;
+
+      res := TOKEN(comment token, buff + current)
+
+    # String and regex #
+    ELIF current = """" OR current = "$" THEN
+      CHAR opnened = current;
+
+      WHILE next /= opnened AND counter < UPB source DO
+        buff +:= current
+      OD;
+
+      res := TOKEN(string token, buff + current)
+
+    # Number #
+    ELIF str includes(current, digits) THEN
+      WHILE str includes(next, digits + ".") AND counter < UPB source DO
+        buff +:= current
+      OD;
+      back;
+
+      res := TOKEN(number token, buff)
+
+    # Identifiers #
+    ELIF str includes(current, alphabet) THEN
+      STRING word := get word;
+      INT kind := unknown token;
+
+      buff +:= word;
+
+      WHILE NOT only uppercase(word) DO
+        WHILE next = " " DO
+          buff +:= current
+        OD;
+        back;
+
+        word := get word;
+
+        IF only uppercase(word) THEN
+          TO UPB word DO
+            back
+          OD
+        ELSE
+          buff +:= word
+        FI
+      OD;
+
+      TO UPB rtrim(buff) DO
+        back
+      OD;
+
+      IF str arr includes(buff, key words) THEN
+        kind := keyword token
+      ELIF buff = "VOID" THEN
+        kind := assign token
+      ELIF str arr includes(buff, sys funcs) THEN
+        kind := function token
+      ELIF str arr includes(buff, ("TRUE", "FALSE")) THEN
+        kind := number token
+      FI;
+
+      res := TOKEN(kind, buff)
+
+    # Unknown #
+    ELSE
+      res := TOKEN(unknown token, buff)
+    FI;
+
+    res
+  );
+
+  PROC lex all = [] TOKEN: (
+    FLEX [0] TOKEN tokens;
+    TOKEN token;
+
+    WHILE TRUE DO
+      token := lex;
+      tokens +:= token;
+
+      IF counter = UPB source THEN
+        GO TO done
+      FI
+    OD;
+    done:
+
+    tokens
+  );
+
+  lex all
+)
+

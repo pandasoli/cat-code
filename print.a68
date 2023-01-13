@@ -1,0 +1,20 @@
+
+PROC print tokens = ([] TOKEN tokens) VOID: (
+  FOR i FROM 1 TO UPB tokens DO
+    TOKEN token = tokens[i];
+
+    IF   kind OF token = assign token    THEN print(( cyan cl,        literal OF token, reset cl ))
+    ELIF kind OF token = comment token   THEN print(( bold black cl,  literal OF token, reset cl ))
+    ELIF kind OF token = string token    THEN print(( green cl,       literal OF token, reset cl ))
+    ELIF kind OF token = number token    THEN print(( yellow cl,      literal OF token, reset cl ))
+    ELIF kind OF token = brackets token  THEN print(( light cyan cl,  literal OF token, reset cl ))
+    ELIF kind OF token = important token THEN print(( red cl,         literal OF token, reset cl ))
+    ELIF kind OF token = unknown token   THEN print(( white cl,       literal OF token, reset cl ))
+    ELIF kind OF token = function token  THEN print(( italic cyan cl, literal OF token, reset cl ))
+    ELIF kind OF token = keyword token   THEN print(( blue cl,        literal OF token, reset cl ))
+    ELSE
+      print(( "Undefined: (", kind OF token, ") ", white cl, literal OF token, reset cl ))
+    FI
+  OD
+)
+

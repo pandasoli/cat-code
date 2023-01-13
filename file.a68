@@ -1,0 +1,25 @@
+
+PROC read file = (STRING path) RES: (
+  RES res := RES(1, "  ");
+
+  FILE file;
+  INT exists = open(file, path, stand in channel);
+
+  IF exists = 0 THEN
+    STRING line;
+    status OF res := 0;
+
+    on logical file end(file, (REF FILE skip) BOOL: done);
+
+    DO
+      getf(file, ($gl$, line));
+      source OF res +:= line + REPR 10 + "  "
+    OD;
+    done:
+
+    close(file)
+  FI;
+
+  res
+)
+

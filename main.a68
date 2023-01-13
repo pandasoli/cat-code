@@ -1,303 +1,52 @@
+#! /usr/local/bin/a68g --script #
+
+PR include "var.a68" PR;
+PR include "types.a68" PR;
+PR include "ops.a68" PR;
+PR include "colors.a68" PR;
+PR include "funcs.a68" PR;
+PR include "term.a68" PR;
+PR include "lexer.a68" PR;
+PR include "file.a68" PR;
+PR include "print.a68" PR;
+
 BEGIN
-  #
-    1: Assign
-    2: Comment
-    3: String
-    4: Number
-    5: Brackets
-    6: Important
-    7: KeyWord
-    8: Unknown
-    9: Function
-  #
-
-  MODE POS = STRUCT(
-    INT x, y
-  );
-
-  MODE TOKEN = STRUCT(
-    INT kind,
-    STRING literal
-  );
-
-  MODE RES = STRUCT(
-    INT status,
-    STRING source
-  );
-
-
-  OP +:= = (REF STRING in out, CHAR item) VOID: in out := in out + item;
-  OP +:= = (REF STRING in out, STRING item) VOID: in out := in out + item;
-  OP +:= = (REF INT in out, INT item) VOID: in out := in out + item;
-
-  OP +:= = (REF FLEX [] TOKEN in out, TOKEN item) VOID: (
-    [1:UPB in out + 1] TOKEN new;
-    new[1:UPB in out] := in out;
-    new[UPB new] := item;
-    in out := new
-  );
-
-  CHAR esc = REPR 27;
-
-  STRING
-    reset cl = esc + "[0m",
-
-    # black cl = esc + "[0;30m" #
-    red cl = esc + "[0;31m",
-    green cl = esc + "[0;32m",
-    yellow cl = esc + "[0;33m",
-    blue cl = esc + "[0;34m",
-    purple cl = esc + "[0;35m",
-    cyan cl = esc + "[0;36m",
-    white cl = esc + "[0;37m",
-
-    bold black cl = esc + "[1;30m",
-    bold red cl = esc + "[1;31m",
-    bold green cl = esc + "[1;32m",
-
-    light cyan cl = esc + "[2;36m";
-    # light purple cl = esc + "[2;35m" #
-
   STRING
     title y := "0",
     title w := "0";
 
+  FOR i FROM 4 TO argc DO
+    STRING current file = argv(i);
 
-  PROC sub str = (STRING str, INT from, INT len) STRING: (
-    STRING res := "";
+    RES file = read file(current file);
 
-    FOR i FROM from TO from + len - 1 DO
-      res := res + str[i]
-    OD;
-
-    res
-  );
-
-  PROC str includes = (STRING includes, str) BOOL: (
-    BOOL res := FALSE;
-
-    FOR i FROM 1 TO UPB str - UPB includes + 1 DO
-      IF sub str(str, i, UPB includes) = includes THEN
-        res := TRUE;
-        GO TO done0
-      FI
-    OD;
-    done0:
-
-    res
-  );
-
-  PROC str arr includes = (STRING item, [] STRING arr) BOOL: (
-    BOOL res := FALSE;
-
-    FOR i FROM 1 TO UPB arr DO
-      IF arr[i] = item THEN
-        res := TRUE;
-        GO TO done1
-      FI
-    OD;
-    done1:
-
-    res
-  );
-
-  PROC get cursor pos = POS: (
-    CHAR in esc;
-    INT line, col;
-
-    VOID( system("stty raw -echo eol R") );
-
-    print(esc + "[6n");
-    readf(( $a"["g(-0)";"g(-0)"r"$, in esc, line, col ));
-
-    VOID( system("stty cooked echo") );
-
-    (col, line)
-  );
-
-
-  PROC lexer = (STRING source) [] TOKEN: (
-    INT counter := 1;
-    STRING
-      buff := "",
-      last buff := "";
-    FLEX [ 0 ] TOKEN tokens;
-
-    [] STRING key words = (
-      "FOR", "FROM", "BY", "PAR", "GO", "TO", "WHILE", "IF", "THEN", "ELIF", "ELSE", "FI", "DO", "OD", "BEGIN", "END", "OF",
-      "PROC", "OP", "REF", "INT", "BOOL", "STRING", "CHAR", "BITS", "AND", "OR", "MODE", "STRUCT", "FILE"
-    );
-
-    WHILE UPB source > counter DO
-      CHAR ch := source[counter];
-
-      last buff := buff;
-      buff := ch;
-
-      VOID( system("tput cup " + title y + " " + title w) );
-      print(( fixed(counter / UPB source * 100, -0, 3), " %" ));
-
-      IF str includes(ch, ":+=-*/<>") THEN
-        tokens +:= TOKEN(1, ch);
-        counter +:= 1
-      ELIF ch = "#" THEN
-        counter +:= 1;
-
-        WHILE source[counter] /= ch AND counter < UPB source DO
-          buff +:= source[counter];
-          counter +:= 1
-        OD;
-
-        tokens +:= TOKEN(2, buff + ch);
-        counter +:= 1
-      ELIF ch = """" OR ch = "$" THEN
-        counter +:= 1;
-
-        WHILE source[counter] /= ch AND counter < UPB source DO
-          buff +:= source[counter];
-          counter +:= 1
-        OD;
-
-        tokens +:= TOKEN(3, buff + ch);
-        counter +:= 1
-      ELIF str includes(ch, "[]();,") THEN
-        tokens +:= TOKEN(5, ch);
-        counter +:= 1
-      ELIF str includes(ch, "0123456789") THEN
-        counter +:= 1;
-
-        DO
-          IF counter >= UPB source THEN
-            GO TO done2
-          FI;
-
-          IF str includes(source[counter], "0123456789") = FALSE AND source[counter] /= "." THEN
-            GO TO done2
-          FI;
-
-          buff +:= source[counter];
-          counter +:= 1
-        OD;
-        done2:
-
-        tokens +:= TOKEN(4, buff)
-      ELIF str includes(ch, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") THEN
-        counter +:= 1;
-
-        WHILE str includes(source[counter], "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") OR str includes(source[counter], "0123456789") AND counter < UPB source DO
-          buff +:= source[counter];
-          counter +:= 1
-        OD;
-
-        INT kind := 8;
-
-        IF str arr includes(buff, key words) THEN
-          kind := 7
-        ELIF
-          buff = "VOID" OR
-          buff = "open" OR buff = "close" OR buff = "argv" OR buff = "argc" OR
-
-          buff = "on" OR
-          last buff = "on" AND buff = "logical" OR
-          last buff = "logical" AND buff = "file" OR
-          last buff = "file" AND buff = "end"
-        THEN
-          kind := 3
-        ELIF
-          buff = "new" OR
-          last buff = "new" AND buff = "line"
-        THEN
-          kind := 4
-        ELIF buff = "FLEX" OR buff = "UPB" OR buff = "REPR" THEN
-          kind := 1
-        ELIF buff = "print" OR buff = "system" OR buff = "printf" OR buff = "get" OR buff = "getf" THEN
-          kind := 9
-        ELIF buff = "TRUE" OR buff = "FALSE" THEN
-          kind := 4
-        FI;
-
-        tokens +:= TOKEN(kind, buff)
-      ELSE
-        tokens +:= TOKEN(8, ch);
-        counter +:= 1
-      FI
-
-    OD;
-
-    tokens
-  );
-
-  PROC highlight = ([] TOKEN tokens) VOID: (
-    VOID( system("tput cup " + title y + " " + title w) );
-    print((  "               ", new line, "  " ));
-
-    FOR i FROM 1 TO UPB tokens DO
-      TOKEN token = tokens[i];
-
-      IF   kind OF token = 1 THEN print(( cyan cl,       literal OF token, reset cl ))
-      ELIF kind OF token = 2 THEN print(( bold black cl, literal OF token, reset cl ))
-      ELIF kind OF token = 3 THEN print(( green cl,      literal OF token, reset cl ))
-      ELIF kind OF token = 4 THEN print(( yellow cl,     literal OF token, reset cl ))
-      ELIF kind OF token = 5 THEN print(( light cyan cl, literal OF token, reset cl ))
-      ELIF kind OF token = 6 THEN print(( red cl,        literal OF token, reset cl ))
-      ELIF kind OF token = 7 THEN print(( purple cl,     literal OF token, reset cl ))
-      ELIF kind OF token = 9 THEN print(( blue cl,       literal OF token, reset cl ))
-      ELSE                        print(( white cl,      literal OF token, reset cl ))
-      FI
-    OD
-  );
-
-  PROC read file = (STRING path) RES: (
-    RES res := RES(1, "");
-
-    FILE file;
-    INT exists = open(file, path, stand in channel);
-
-    IF exists = 0 THEN
-      STRING line;
-      status OF res := 0;
-
-      on logical file end(file, (REF FILE skip) BOOL: done);
-
-      DO
-        getf(file, ($gl$, line));
-        source OF res +:= line + REPR 10 + "  "
-      OD;
-
-      close(file)
+    IF status OF file /= 0 THEN
+      print(( bold red cl, "✗ ", current file, ": ", red cl, "Doesn't exist", reset cl, new line ));
+      GO TO done
     FI;
 
-    done:
-    res
-  );
+    title y := whole(y OF get cursor pos - 2, 0);
+    title w := whole(2 + UPB current file + 2, 0);
 
+    print(( bold green cl, "✔ ", current file, ":", reset cl, new line ));
 
-  PROC main = VOID: (
-    FOR i FROM 4 TO argc DO
-      STRING current file = argv(i);
+    [] TOKEN tokens = lexer(
+      source OF file,
+      (INT counter, BOOL skip) VOID: (
+        VOID( system("tput cup " + title y + " " + title w) );
+        print(( fixed(counter / UPB source OF file * 100, -0, 3), " %" ))
+      )
+    );
 
-      RES file = read file(current file);
+    VOID( system("tput cup " + title y + " " + title w) );
+    print((  "               ", new line ));
+    print tokens(tokens);
 
-      IF status OF file = 0 THEN
-        title y := whole(y OF get cursor pos - 2, 0);
-        title w := whole(2 + UPB current file + 2, 0);
+    print( new line );
 
-        print(( bold green cl, "✔ ", current file, ":", reset cl ));
-        print( new line );
+    done: ~
+  OD;
 
-        [] TOKEN tokens = lexer(source OF file);
-        print(( new line, "  " ));
-        highlight(tokens);
-
-        print( new line )
-      ELSE
-        print(( bold red cl, "✗ ", current file, ": ", red cl, "Doesn't exist", reset cl, new line ))
-      FI
-    OD;
-
-    print( new line )
-  );
-
-
-  main
+  print( new line )
 END
+

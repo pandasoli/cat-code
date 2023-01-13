@@ -1,0 +1,15 @@
+
+MODE POS = STRUCT(
+  INT x, y
+);
+
+MODE TOKEN = STRUCT(
+  INT kind,
+  STRING literal
+);
+
+MODE RES = STRUCT(
+  INT status,
+  STRING source
+)
+

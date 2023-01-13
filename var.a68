@@ -1,0 +1,6 @@
+STRING
+  lower alphabet = "abcdefghijklmnopqrstuvwxyz",
+  upper alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  alphabet = lower alphabet + upper alphabet,
+  digits = "0123456789"
+

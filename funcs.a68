@@ -1,0 +1,65 @@
+#
+  "warning: 1: value of BOOL denotation will be voided, in conditional-clause starting at "IF" in line 3."
+
+  I guessed it meant the TRUE would not be returned,
+  so I created the variable res for both functions.
+#
+
+PROC str includes = (CHAR includes, STRING str) BOOL: (
+  BOOL res := FALSE;
+
+  FOR i FROM 1 TO UPB str DO
+    IF str[i] = includes THEN
+      res := TRUE;
+      GO TO done
+    FI
+  OD;
+  done:
+
+  res
+);
+
+PROC str arr includes = (STRING item, [] STRING arr) BOOL: (
+  BOOL res := FALSE;
+
+  FOR i FROM 1 TO UPB arr DO
+    IF arr[i] = item THEN
+      res := TRUE;
+      GO TO done
+    FI
+  OD;
+  done:
+
+  res
+);
+
+PROC rtrim = (REF STRING str) STRING: (
+  STRING res := "";
+  CHAR last ch := str[UPB str];
+
+  WHILE last ch = " " DO
+    str := str[:UPB str - 1];
+    res +:= " ";
+
+    last ch := str[UPB str]
+  OD;
+
+  res
+);
+
+PROC only uppercase = (STRING str) BOOL: (
+  BOOL res := TRUE;
+
+  FOR i TO UPB str DO
+    CHAR ch = str[i];
+
+    IF str includes(ch, lower alphabet) THEN
+      res := FALSE;
+      GO TO done
+    FI
+  OD;
+  done:
+
+  res
+)
+
