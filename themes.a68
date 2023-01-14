@@ -1,0 +1,13 @@
+
+THEME nord theme = (
+  cyan cl,
+  bold black cl,
+  green cl,
+  yellow cl,
+  light cyan cl,
+  red cl,
+  italic blue cl,
+  white cl,
+  italic cyan cl
+)
+

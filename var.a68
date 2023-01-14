@@ -2,5 +2,29 @@ STRING
   lower alphabet = "abcdefghijklmnopqrstuvwxyz",
   upper alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   alphabet = lower alphabet + upper alphabet,
-  digits = "0123456789"
+  digits = "0123456789";
+
+CHAR esc = REPR 27;
+STRING
+  reset cl = esc + "[0m",
+
+  black cl = esc + "[0;30m",
+  red cl = esc + "[0;31m",
+  green cl = esc + "[0;32m",
+  yellow cl = esc + "[0;33m",
+  blue cl = esc + "[0;34m",
+  purple cl = esc + "[0;35m",
+  cyan cl = esc + "[0;36m",
+  white cl = esc + "[0;37m",
+
+  bold black cl = esc + "[1;30m",
+  bold red cl = esc + "[1;31m",
+  bold green cl = esc + "[1;32m",
+  bold blue cl = esc + "[1;34m",
+
+  light cyan cl = esc + "[2;36m",
+  light purple cl = esc + "[2;35m",
+
+  italic cyan cl = esc + "[3;36m",
+  italic blue cl = esc + "[3;34m"
 

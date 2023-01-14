@@ -35,25 +35,9 @@ PROC lexer = (STRING source, PROC (INT, BOOL) VOID callback) [] TOKEN: (
     current
   );
 
-  PROC next some = (INT count) REF CHAR: (
-    TO count DO
-      next
-    OD;
-
-    current
-  );
-
   PROC back = REF CHAR: (
     counter -:= 2;
     next;
-
-    current
-  );
-
-  PROC back some = (INT count) REF CHAR: (
-    TO count DO
-      back
-    OD;
 
     current
   );
@@ -75,6 +59,8 @@ PROC lexer = (STRING source, PROC (INT, BOOL) VOID callback) [] TOKEN: (
     current := next;
     STRING buff := current;
     TOKEN res := (-1, "");
+
+    callback(counter, ~);
 
     # Assignments #
     IF str includes(current, ":+=-*/<>") THEN

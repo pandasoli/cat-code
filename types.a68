@@ -11,5 +11,18 @@ MODE TOKEN = STRUCT(
 MODE RES = STRUCT(
   INT status,
   STRING source
+);
+
+MODE THEME = STRUCT(
+  STRING
+    assign,
+    comment,
+    string,
+    number,
+    brackets,
+    important,
+    keyword,
+    unknown,
+    function
 )
 
