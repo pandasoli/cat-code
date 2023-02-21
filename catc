@@ -1,0 +1,3 @@
+#!/bin/bash
+
+a68g main.a68 --nowarnings -- $*

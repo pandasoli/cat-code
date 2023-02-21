@@ -1,5 +1,3 @@
-#! /usr/local/bin/a68g --script #
-
 PR include "var.a68" PR;
 PR include "types.a68" PR;
 PR include "themes.a68" PR;
@@ -14,23 +12,34 @@ BEGIN
   STRING
     title y := "0",
     title w := "0";
+  BOOL
+    started params := FALSE;
 
   PROC set title pos = VOID: VOID(system("tput cup " + title y + " " + title w));
+  print(new line);
 
-  FOR i FROM 4 TO argc DO
-    STRING current file = argv(i);
+  FOR i TO argc DO
+    STRING arg = argv(i);
 
-    RES file = read file(current file);
+    IF NOT started params THEN
+      IF arg = "--" THEN
+        started params := TRUE
+      FI;
+
+      GO TO done
+    FI;
+
+    RES file = read file(arg);
 
     IF status OF file /= 0 THEN
-      print(( bold red cl, "✗ ", current file, ": ", red cl, "Doesn't exist", reset cl, new line ));
+      print(( bold red cl, "✗ ", arg, ": ", red cl, "Doesn't exist", reset cl, new line ));
       GO TO done
     FI;
 
     title y := whole(y OF get cursor pos - 2, 0);
-    title w := whole(2 + UPB current file + 2, 0);
+    title w := whole(2 + UPB arg + 2, 0);
 
-    print(( bold green cl, "✔ ", current file, ":", reset cl, new line ));
+    print(( bold green cl, "✔ ", arg, ":", reset cl, new line ));
 
     [] TOKEN tokens = lexer(
       source OF file,
@@ -47,8 +56,5 @@ BEGIN
     print( new line );
 
     done: ~
-  OD;
-
-  print( new line )
+  OD
 END
-
