@@ -164,4 +164,3 @@ PROC lexer = (STRING source, PROC (INT, BOOL) VOID callback) [] TOKEN: (
 
   lex all
 )
-

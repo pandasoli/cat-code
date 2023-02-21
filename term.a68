@@ -11,4 +11,3 @@ PROC get cursor pos = POS: (
 
   (col, line)
 )
-

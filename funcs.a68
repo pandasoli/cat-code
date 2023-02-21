@@ -62,4 +62,3 @@ PROC only uppercase = (STRING str) BOOL: (
 
   res
 )
-

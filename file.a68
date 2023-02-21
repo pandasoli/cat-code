@@ -22,4 +22,3 @@ PROC read file = (STRING path) RES: (
 
   res
 )
-

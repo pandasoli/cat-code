@@ -27,4 +27,3 @@ STRING
 
   italic cyan cl = esc + "[3;36m",
   italic blue cl = esc + "[3;34m"
-
